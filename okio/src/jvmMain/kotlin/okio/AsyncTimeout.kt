@@ -36,13 +36,13 @@ import java.util.concurrent.TimeUnit
  * [timedOut] is asynchronous, and may be called after [exit].
  */
 open class AsyncTimeout : Timeout() {
-  /** True if this node is currently in the queue.  */
+  /** True if this node is currently in the queue. */
   private var inQueue = false
 
-  /** The next node in the linked list.  */
+  /** The next node in the linked list. */
   private var next: AsyncTimeout? = null
 
-  /** If scheduled, this is the time that the watchdog should time this out.  */
+  /** If scheduled, this is the time that the watchdog should time this out. */
   private var timeoutAt = 0L
 
   fun enter() {
@@ -56,7 +56,7 @@ open class AsyncTimeout : Timeout() {
     scheduleTimeout(this, timeoutNanos, hasDeadline)
   }
 
-  /** Returns true if the timeout occurred.  */
+  /** Returns true if the timeout occurred. */
   fun exit(): Boolean {
     if (!inQueue) return false
     inQueue = false
@@ -76,8 +76,8 @@ open class AsyncTimeout : Timeout() {
   protected open fun timedOut() {}
 
   /**
-   * Returns a new sink that delegates to [sink], using this to implement timeouts. This works
-   * best if [timedOut] is overridden to interrupt [sink]'s current operation.
+   * Returns a new sink that delegates to [sink], using this to implement timeouts. This works best
+   * if [timedOut] is overridden to interrupt [sink]'s current operation.
    */
   fun sink(sink: Sink): Sink {
     return object : Sink {
@@ -163,8 +163,8 @@ open class AsyncTimeout : Timeout() {
 
   /**
    * Returns an [IOException] to represent a timeout. By default this method returns
-   * [InterruptedIOException]. If [cause] is non-null it is set as the cause of the
-   * returned exception.
+   * [InterruptedIOException]. If [cause] is non-null it is set as the cause of the returned
+   * exception.
    */
   protected open fun newTimeoutException(cause: IOException?): IOException {
     val e = InterruptedIOException("timeout")
@@ -196,8 +196,7 @@ open class AsyncTimeout : Timeout() {
 
           // Close the timed out node, if one was found.
           timedOut?.timedOut()
-        } catch (ignored: InterruptedException) {
-        }
+        } catch (ignored: InterruptedException) {}
       }
     }
   }
@@ -210,7 +209,7 @@ open class AsyncTimeout : Timeout() {
      */
     private const val TIMEOUT_WRITE_SIZE = 64 * 1024
 
-    /** Duration for the watchdog thread to be idle before it shuts itself down.  */
+    /** Duration for the watchdog thread to be idle before it shuts itself down. */
     private val IDLE_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(60)
     private val IDLE_TIMEOUT_NANOS = TimeUnit.MILLISECONDS.toNanos(IDLE_TIMEOUT_MILLIS)
 

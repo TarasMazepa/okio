@@ -26,17 +26,13 @@ import javax.crypto.spec.SecretKeySpec
  * instance with your preferred hash algorithm. Exhaust the source by reading all of its bytes and
  * then call [hash] to compute the final hash value.
  *
- *
- * In this example we use `HashingSource` with a [BufferedSource] to make reading
- * from the source easier.
- * ```
- * HashingSource hashingSource = HashingSource.sha256(rawSource);
- * BufferedSource bufferedSource = Okio.buffer(hashingSource);
+ * In this example we use `HashingSource` with a [BufferedSource] to make reading from the source
+ * easier. ``` HashingSource hashingSource = HashingSource.sha256(rawSource); BufferedSource
+ * bufferedSource = Okio.buffer(hashingSource);
  *
  * ... // Read all of bufferedSource.
  *
- * ByteString hash = hashingSource.hash();
- * ```
+ * ByteString hash = hashingSource.hash(); ```
  */
 class HashingSource : ForwardingSource {
   private val messageDigest: MessageDigest?
@@ -49,9 +45,7 @@ class HashingSource : ForwardingSource {
 
   internal constructor(source: Source, key: ByteString, algorithm: String) : super(source) {
     try {
-      mac = Mac.getInstance(algorithm).apply {
-        init(SecretKeySpec(key.toByteArray(), algorithm))
-      }
+      mac = Mac.getInstance(algorithm).apply { init(SecretKeySpec(key.toByteArray(), algorithm)) }
       messageDigest = null
     } catch (e: InvalidKeyException) {
       throw IllegalArgumentException(e)
@@ -93,8 +87,8 @@ class HashingSource : ForwardingSource {
   /**
    * Returns the hash of the bytes supplied thus far and resets the internal state of this source.
    *
-   * **Warning:** This method is not idempotent. Each time this method is called its
-   * internal state is cleared. This starts a new hash with zero bytes supplied.
+   * **Warning:** This method is not idempotent. Each time this method is called its internal state
+   * is cleared. This starts a new hash with zero bytes supplied.
    */
   @get:JvmName("hash")
   val hash: ByteString
@@ -124,8 +118,8 @@ class HashingSource : ForwardingSource {
     @JvmStatic fun sha512(source: Source) = HashingSource(source, "SHA-512")
 
     /** Returns a sink that uses the obsolete SHA-1 HMAC algorithm to produce 160-bit hashes. */
-    @JvmStatic fun hmacSha1(source: Source, key: ByteString) = HashingSource(source, key,
-        "HmacSHA1")
+    @JvmStatic
+    fun hmacSha1(source: Source, key: ByteString) = HashingSource(source, key, "HmacSHA1")
 
     /** Returns a sink that uses the SHA-256 HMAC algorithm to produce 256-bit hashes. */
     @JvmStatic

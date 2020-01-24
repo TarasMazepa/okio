@@ -16,7 +16,6 @@
 
 // TODO move to RealBufferedSink class: https://youtrack.jetbrains.com/issue/KT-20427
 @file:Suppress("NOTHING_TO_INLINE")
-
 package okio.internal
 
 import okio.Buffer
@@ -32,61 +31,46 @@ internal inline fun RealBufferedSink.commonWrite(source: Buffer, byteCount: Long
   buffer.write(source, byteCount)
   emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWrite(byteString: ByteString): BufferedSink {
   check(!closed) { "closed" }
   buffer.write(byteString)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWrite(
-  byteString: ByteString,
-  offset: Int,
-  byteCount: Int
+    byteString: ByteString, offset: Int, byteCount: Int
 ): BufferedSink {
   check(!closed) { "closed" }
   buffer.write(byteString, offset, byteCount)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteUtf8(string: String): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeUtf8(string)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteUtf8(
-  string: String,
-  beginIndex: Int,
-  endIndex: Int
+    string: String, beginIndex: Int, endIndex: Int
 ): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeUtf8(string, beginIndex, endIndex)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteUtf8CodePoint(codePoint: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeUtf8CodePoint(codePoint)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWrite(source: ByteArray): BufferedSink {
   check(!closed) { "closed" }
   buffer.write(source)
   return emitCompleteSegments()
 }
-
-internal inline fun RealBufferedSink.commonWrite(
-  source: ByteArray,
-  offset: Int,
-  byteCount: Int
-): BufferedSink {
+internal inline fun RealBufferedSink.commonWrite(source: ByteArray, offset: Int, byteCount: Int):
+    BufferedSink {
   check(!closed) { "closed" }
   buffer.write(source, offset, byteCount)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteAll(source: Source): Long {
   var totalBytesRead = 0L
   while (true) {
@@ -97,7 +81,6 @@ internal inline fun RealBufferedSink.commonWriteAll(source: Source): Long {
   }
   return totalBytesRead
 }
-
 internal inline fun RealBufferedSink.commonWrite(source: Source, byteCount: Long): BufferedSink {
   var byteCount = byteCount
   while (byteCount > 0L) {
@@ -108,75 +91,63 @@ internal inline fun RealBufferedSink.commonWrite(source: Source, byteCount: Long
   }
   return this
 }
-
 internal inline fun RealBufferedSink.commonWriteByte(b: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeByte(b)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteShort(s: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeShort(s)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteShortLe(s: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeShortLe(s)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteInt(i: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeInt(i)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteIntLe(i: Int): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeIntLe(i)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteLong(v: Long): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeLong(v)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteLongLe(v: Long): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeLongLe(v)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteDecimalLong(v: Long): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeDecimalLong(v)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonWriteHexadecimalUnsignedLong(v: Long): BufferedSink {
   check(!closed) { "closed" }
   buffer.writeHexadecimalUnsignedLong(v)
   return emitCompleteSegments()
 }
-
 internal inline fun RealBufferedSink.commonEmitCompleteSegments(): BufferedSink {
   check(!closed) { "closed" }
   val byteCount = buffer.completeSegmentByteCount()
   if (byteCount > 0L) sink.write(buffer, byteCount)
   return this
 }
-
 internal inline fun RealBufferedSink.commonEmit(): BufferedSink {
   check(!closed) { "closed" }
   val byteCount = buffer.size
   if (byteCount > 0L) sink.write(buffer, byteCount)
   return this
 }
-
 internal inline fun RealBufferedSink.commonFlush() {
   check(!closed) { "closed" }
   if (buffer.size > 0L) {
@@ -184,7 +155,6 @@ internal inline fun RealBufferedSink.commonFlush() {
   }
   sink.flush()
 }
-
 internal inline fun RealBufferedSink.commonClose() {
   if (closed) return
 
@@ -209,7 +179,5 @@ internal inline fun RealBufferedSink.commonClose() {
 
   if (thrown != null) throw thrown
 }
-
 internal inline fun RealBufferedSink.commonTimeout() = sink.timeout()
-
 internal inline fun RealBufferedSink.commonToString() = "buffer($sink)"

@@ -28,7 +28,8 @@ import kotlin.test.assertTrue
  * BufferedSource behavior use BufferedSinkTest or BufferedSourceTest, respectively.
  */
 class CommonBufferTest {
-  @Test fun readAndWriteUtf8() {
+  @Test
+  fun readAndWriteUtf8() {
     val buffer = Buffer()
     buffer.writeUtf8("ab")
     assertEquals(2, buffer.size)
@@ -38,35 +39,26 @@ class CommonBufferTest {
     assertEquals(2, buffer.size)
     assertEquals("ef", buffer.readUtf8(2))
     assertEquals(0, buffer.size)
-    assertFailsWith<EOFException> {
-      buffer.readUtf8(1)
-    }
+    assertFailsWith<EOFException> { buffer.readUtf8(1) }
   }
 
-  /** Buffer's toString is the same as ByteString's.  */
-  @Test fun bufferToString() {
+  /** Buffer's toString is the same as ByteString's. */
+  @Test
+  fun bufferToString() {
     assertEquals("[size=0]", Buffer().toString())
+    assertEquals("[text=a\\r\\nb\\nc\\rd\\\\e]", Buffer().writeUtf8("a\r\nb\nc\rd\\e").toString())
+    assertEquals("[text=Tyrannosaur]", Buffer().writeUtf8("Tyrannosaur").toString())
     assertEquals(
-      "[text=a\\r\\nb\\nc\\rd\\\\e]",
-      Buffer().writeUtf8("a\r\nb\nc\rd\\e").toString()
-    )
+        "[text=təˈranəˌsôr]",
+        Buffer().write("74c999cb8872616ec999cb8c73c3b472".decodeHex()).toString())
     assertEquals(
-      "[text=Tyrannosaur]",
-      Buffer().writeUtf8("Tyrannosaur").toString()
-    )
-    assertEquals(
-      "[text=təˈranəˌsôr]", Buffer()
-        .write("74c999cb8872616ec999cb8c73c3b472".decodeHex())
-        .toString()
-    )
-    assertEquals(
-      "[hex=0000000000000000000000000000000000000000000000000000000000000000000000000000" +
-          "0000000000000000000000000000000000000000000000000000]",
-      Buffer().write(ByteArray(64)).toString()
-    )
+        "[hex=0000000000000000000000000000000000000000000000000000000000000000000000000000" +
+            "0000000000000000000000000000000000000000000000000000]",
+        Buffer().write(ByteArray(64)).toString())
   }
 
-  @Test fun multipleSegmentBuffers() {
+  @Test
+  fun multipleSegmentBuffers() {
     val buffer = Buffer()
     buffer.writeUtf8('a'.repeat(1000))
     buffer.writeUtf8('b'.repeat(2500))
@@ -84,7 +76,8 @@ class CommonBufferTest {
     assertEquals(0, buffer.size)
   }
 
-  @Test fun fillAndDrainPool() {
+  @Test
+  fun fillAndDrainPool() {
     val buffer = Buffer()
 
     // Take 2 * MAX_SIZE segments. This will drain the pool, even if other tests filled it.
@@ -109,27 +102,35 @@ class CommonBufferTest {
     assertEquals(0, SegmentPool.byteCount)
   }
 
-  @Test fun moveBytesBetweenBuffersShareSegment() {
+  @Test
+  fun moveBytesBetweenBuffersShareSegment() {
     val size = Segment.SIZE / 2 - 1
     val segmentSizes = moveBytesBetweenBuffers('a'.repeat(size), 'b'.repeat(size))
     assertEquals(listOf(size * 2), segmentSizes)
   }
 
-  @Test fun moveBytesBetweenBuffersReassignSegment() {
+  @Test
+  fun moveBytesBetweenBuffersReassignSegment() {
     val size = Segment.SIZE / 2 + 1
     val segmentSizes = moveBytesBetweenBuffers('a'.repeat(size), 'b'.repeat(size))
     assertEquals(listOf(size, size), segmentSizes)
   }
 
-  @Test fun moveBytesBetweenBuffersMultipleSegments() {
+  @Test
+  fun moveBytesBetweenBuffersMultipleSegments() {
     val size = 3 * Segment.SIZE + 1
     val segmentSizes = moveBytesBetweenBuffers('a'.repeat(size), 'b'.repeat(size))
     assertEquals(
-      listOf(
-        Segment.SIZE, Segment.SIZE, Segment.SIZE, 1,
-        Segment.SIZE, Segment.SIZE, Segment.SIZE, 1
-      ), segmentSizes
-    )
+        listOf(
+            Segment.SIZE,
+            Segment.SIZE,
+            Segment.SIZE,
+            1,
+            Segment.SIZE,
+            Segment.SIZE,
+            Segment.SIZE,
+            1),
+        segmentSizes)
   }
 
   private fun moveBytesBetweenBuffers(vararg contents: String): List<Int> {
@@ -146,8 +147,9 @@ class CommonBufferTest {
     return segmentSizes
   }
 
-  /** The big part of source's first segment is being moved.  */
-  @Test fun writeSplitSourceBufferLeft() {
+  /** The big part of source's first segment is being moved. */
+  @Test
+  fun writeSplitSourceBufferLeft() {
     val writeSize = Segment.SIZE / 2 + 1
 
     val sink = Buffer()
@@ -161,8 +163,9 @@ class CommonBufferTest {
     assertEquals(listOf(Segment.SIZE - writeSize, Segment.SIZE), segmentSizes(source))
   }
 
-  /** The big part of source's first segment is staying put.  */
-  @Test fun writeSplitSourceBufferRight() {
+  /** The big part of source's first segment is staying put. */
+  @Test
+  fun writeSplitSourceBufferRight() {
     val writeSize = Segment.SIZE / 2 - 1
 
     val sink = Buffer()
@@ -176,7 +179,8 @@ class CommonBufferTest {
     assertEquals(listOf(Segment.SIZE - writeSize, Segment.SIZE), segmentSizes(source))
   }
 
-  @Test fun writePrefixDoesntSplit() {
+  @Test
+  fun writePrefixDoesntSplit() {
     val sink = Buffer()
     sink.writeUtf8('b'.repeat(10))
 
@@ -190,7 +194,8 @@ class CommonBufferTest {
     assertEquals((Segment.SIZE * 2 - 20).toLong(), source.size)
   }
 
-  @Test fun writePrefixDoesntSplitButRequiresCompact() {
+  @Test
+  fun writePrefixDoesntSplitButRequiresCompact() {
     val sink = Buffer()
     sink.writeUtf8('b'.repeat(Segment.SIZE - 10)) // limit = size - 10
     sink.readUtf8((Segment.SIZE - 20).toLong()) // pos = size = 20
@@ -205,7 +210,8 @@ class CommonBufferTest {
     assertEquals((Segment.SIZE * 2 - 20).toLong(), source.size)
   }
 
-  @Test fun moveAllRequestedBytesWithRead() {
+  @Test
+  fun moveAllRequestedBytesWithRead() {
     val sink = Buffer()
     sink.writeUtf8('a'.repeat(10))
 
@@ -218,7 +224,8 @@ class CommonBufferTest {
     assertEquals('a'.repeat(10) + 'b'.repeat(10), sink.readUtf8(20))
   }
 
-  @Test fun moveFewerThanRequestedBytesWithRead() {
+  @Test
+  fun moveFewerThanRequestedBytesWithRead() {
     val sink = Buffer()
     sink.writeUtf8('a'.repeat(10))
 
@@ -231,7 +238,8 @@ class CommonBufferTest {
     assertEquals('a'.repeat(10) + 'b'.repeat(20), sink.readUtf8(30))
   }
 
-  @Test fun indexOfWithOffset() {
+  @Test
+  fun indexOfWithOffset() {
     val buffer = Buffer()
     val halfSegment = Segment.SIZE / 2
     buffer.writeUtf8('a'.repeat(halfSegment))
@@ -239,16 +247,24 @@ class CommonBufferTest {
     buffer.writeUtf8('c'.repeat(halfSegment))
     buffer.writeUtf8('d'.repeat(halfSegment))
     assertEquals(0, buffer.indexOf('a'.toByte(), 0))
-    assertEquals((halfSegment - 1).toLong(), buffer.indexOf('a'.toByte(), (halfSegment - 1).toLong()))
+    assertEquals(
+        (halfSegment - 1).toLong(), buffer.indexOf('a'.toByte(), (halfSegment - 1).toLong()))
     assertEquals(halfSegment.toLong(), buffer.indexOf('b'.toByte(), (halfSegment - 1).toLong()))
-    assertEquals((halfSegment * 2).toLong(), buffer.indexOf('c'.toByte(), (halfSegment - 1).toLong()))
-    assertEquals((halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment - 1).toLong()))
-    assertEquals((halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment * 2).toLong()))
-    assertEquals((halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment * 3).toLong()))
-    assertEquals((halfSegment * 4 - 1).toLong(), buffer.indexOf('d'.toByte(), (halfSegment * 4 - 1).toLong()))
+    assertEquals(
+        (halfSegment * 2).toLong(), buffer.indexOf('c'.toByte(), (halfSegment - 1).toLong()))
+    assertEquals(
+        (halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment - 1).toLong()))
+    assertEquals(
+        (halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment * 2).toLong()))
+    assertEquals(
+        (halfSegment * 3).toLong(), buffer.indexOf('d'.toByte(), (halfSegment * 3).toLong()))
+    assertEquals(
+        (halfSegment * 4 - 1).toLong(),
+        buffer.indexOf('d'.toByte(), (halfSegment * 4 - 1).toLong()))
   }
 
-  @Test fun byteAt() {
+  @Test
+  fun byteAt() {
     val buffer = Buffer()
     buffer.writeUtf8("a")
     buffer.writeUtf8('b'.repeat(Segment.SIZE))
@@ -260,11 +276,10 @@ class CommonBufferTest {
     assertEquals('b'.toLong(), buffer.get(buffer.size - 3).toLong())
   }
 
-  @Test fun getByteOfEmptyBuffer() {
+  @Test
+  fun getByteOfEmptyBuffer() {
     val buffer = Buffer()
-    assertFailsWith<IndexOutOfBoundsException> {
-      buffer.get(0)
-    }
+    assertFailsWith<IndexOutOfBoundsException> { buffer.get(0) }
   }
 
   @Test
@@ -277,7 +292,8 @@ class CommonBufferTest {
   }
 
   @Suppress("ReplaceAssertBooleanWithAssertEquality")
-  @Test fun equalsAndHashCodeEmpty() {
+  @Test
+  fun equalsAndHashCodeEmpty() {
     val a = Buffer()
     val b = Buffer()
     assertTrue(a == b)
@@ -285,7 +301,8 @@ class CommonBufferTest {
   }
 
   @Suppress("ReplaceAssertBooleanWithAssertEquality")
-  @Test fun equalsAndHashCode() {
+  @Test
+  fun equalsAndHashCode() {
     val a = Buffer().writeUtf8("dog")
     val b = Buffer().writeUtf8("hotdog")
     assertFalse(a == b)
@@ -297,7 +314,8 @@ class CommonBufferTest {
   }
 
   @Suppress("ReplaceAssertBooleanWithAssertEquality")
-  @Test fun equalsAndHashCodeSpanningSegments() {
+  @Test
+  fun equalsAndHashCodeSpanningSegments() {
     val data = ByteArray(1024 * 1024)
     val dice = Random(0)
     dice.nextBytes(data)
@@ -313,22 +331,18 @@ class CommonBufferTest {
     assertFalse(a.hashCode() == c.hashCode())
   }
 
-  /**
-   * When writing data that's already buffered, there's no reason to page the
-   * data by segment.
-   */
-  @Test fun readAllWritesAllSegmentsAtOnce() {
-    val write1 = Buffer().writeUtf8(
-      'a'.repeat(Segment.SIZE) +
-        'b'.repeat(Segment.SIZE) +
-        'c'.repeat(Segment.SIZE)
-    )
+  /** When writing data that's already buffered, there's no reason to page the data by segment. */
+  @Test
+  fun readAllWritesAllSegmentsAtOnce() {
+    val write1 =
+        Buffer()
+            .writeUtf8(
+            'a'.repeat(Segment.SIZE) + 'b'.repeat(Segment.SIZE) + 'c'.repeat(Segment.SIZE))
 
-    val source = Buffer().writeUtf8(
-      'a'.repeat(Segment.SIZE) +
-        'b'.repeat(Segment.SIZE) +
-        'c'.repeat(Segment.SIZE)
-    )
+    val source =
+        Buffer()
+            .writeUtf8(
+            'a'.repeat(Segment.SIZE) + 'b'.repeat(Segment.SIZE) + 'c'.repeat(Segment.SIZE))
 
     val mockSink = MockSink()
 
@@ -337,7 +351,8 @@ class CommonBufferTest {
     mockSink.assertLog("write($write1, ${write1.size})")
   }
 
-  @Test fun writeAllMultipleSegments() {
+  @Test
+  fun writeAllMultipleSegments() {
     val source = Buffer().writeUtf8('a'.repeat(Segment.SIZE * 3))
     val sink = Buffer()
 
@@ -346,7 +361,8 @@ class CommonBufferTest {
     assertEquals('a'.repeat(Segment.SIZE * 3), sink.readUtf8())
   }
 
-  @Test fun copyTo() {
+  @Test
+  fun copyTo() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -357,7 +373,8 @@ class CommonBufferTest {
     assertEquals("party", source.readUtf8())
   }
 
-  @Test fun copyToOnSegmentBoundary() {
+  @Test
+  fun copyToOnSegmentBoundary() {
     val `as` = 'a'.repeat(Segment.SIZE)
     val bs = 'b'.repeat(Segment.SIZE)
     val cs = 'c'.repeat(Segment.SIZE)
@@ -375,7 +392,8 @@ class CommonBufferTest {
     assertEquals(ds + bs + cs, target.readUtf8())
   }
 
-  @Test fun copyToOffSegmentBoundary() {
+  @Test
+  fun copyToOffSegmentBoundary() {
     val `as` = 'a'.repeat(Segment.SIZE - 1)
     val bs = 'b'.repeat(Segment.SIZE + 2)
     val cs = 'c'.repeat(Segment.SIZE - 4)
@@ -393,7 +411,8 @@ class CommonBufferTest {
     assertEquals(ds + bs + cs, target.readUtf8())
   }
 
-  @Test fun copyToSourceAndTargetCanBeTheSame() {
+  @Test
+  fun copyToSourceAndTargetCanBeTheSame() {
     val `as` = 'a'.repeat(Segment.SIZE)
     val bs = 'b'.repeat(Segment.SIZE)
 
@@ -405,7 +424,8 @@ class CommonBufferTest {
     assertEquals(`as` + bs + `as` + bs, source.readUtf8())
   }
 
-  @Test fun copyToEmptySource() {
+  @Test
+  fun copyToEmptySource() {
     val source = Buffer()
     val target = Buffer().writeUtf8("aaa")
     source.copyTo(target, 0L, 0L)
@@ -413,7 +433,8 @@ class CommonBufferTest {
     assertEquals("aaa", target.readUtf8())
   }
 
-  @Test fun copyToEmptyTarget() {
+  @Test
+  fun copyToEmptyTarget() {
     val source = Buffer().writeUtf8("aaa")
     val target = Buffer()
     source.copyTo(target, 0L, 3L)
@@ -421,7 +442,8 @@ class CommonBufferTest {
     assertEquals("aaa", target.readUtf8())
   }
 
-  @Test fun snapshotReportsAccurateSize() {
+  @Test
+  fun snapshotReportsAccurateSize() {
     val buf = Buffer().write(byteArrayOf(0, 1, 2, 3))
     assertEquals(1, buf.snapshot(1).size)
   }

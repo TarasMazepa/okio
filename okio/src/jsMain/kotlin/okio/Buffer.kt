@@ -61,7 +61,8 @@ actual class Buffer : BufferedSource, BufferedSink {
   actual var size: Long = 0L
     internal set
 
-  actual override val buffer: Buffer get() = this
+  actual override val buffer: Buffer
+    get() = this
 
   actual override fun emitCompleteSegments(): Buffer = this // Nowhere to emit to!
 
@@ -77,16 +78,10 @@ actual class Buffer : BufferedSource, BufferedSink {
 
   override fun peek(): BufferedSource = PeekSource(this).buffer()
 
-  actual fun copyTo(
-    out: Buffer,
-    offset: Long,
-    byteCount: Long
-  ): Buffer = commonCopyTo(out, offset, byteCount)
+  actual fun copyTo(out: Buffer, offset: Long, byteCount: Long): Buffer =
+      commonCopyTo(out, offset, byteCount)
 
-  actual fun copyTo(
-    out: Buffer,
-    offset: Long
-  ): Buffer = copyTo(out, offset, size - offset)
+  actual fun copyTo(out: Buffer, offset: Long): Buffer = copyTo(out, offset, size - offset)
 
   actual operator fun get(pos: Long): Byte = commonGet(pos)
 
@@ -141,7 +136,7 @@ actual class Buffer : BufferedSource, BufferedSink {
   override fun readFully(sink: ByteArray): Unit = commonReadFully(sink)
 
   override fun read(sink: ByteArray, offset: Int, byteCount: Int): Int =
-    commonRead(sink, offset, byteCount)
+      commonRead(sink, offset, byteCount)
 
   actual fun clear(): Unit = commonClear()
 
@@ -150,28 +145,28 @@ actual class Buffer : BufferedSource, BufferedSink {
   actual override fun write(byteString: ByteString): Buffer = commonWrite(byteString)
 
   actual override fun write(byteString: ByteString, offset: Int, byteCount: Int) =
-    commonWrite(byteString, offset, byteCount)
+      commonWrite(byteString, offset, byteCount)
 
   internal actual fun writableSegment(minimumCapacity: Int): Segment =
-    commonWritableSegment(minimumCapacity)
+      commonWritableSegment(minimumCapacity)
 
   actual override fun writeUtf8(string: String): Buffer = writeUtf8(string, 0, string.length)
 
   actual override fun writeUtf8(string: String, beginIndex: Int, endIndex: Int): Buffer =
-    commonWriteUtf8(string, beginIndex, endIndex)
+      commonWriteUtf8(string, beginIndex, endIndex)
 
   actual override fun writeUtf8CodePoint(codePoint: Int): Buffer =
-    commonWriteUtf8CodePoint(codePoint)
+      commonWriteUtf8CodePoint(codePoint)
 
   actual override fun write(source: ByteArray): Buffer = commonWrite(source)
 
   actual override fun write(source: ByteArray, offset: Int, byteCount: Int): Buffer =
-    commonWrite(source, offset, byteCount)
+      commonWrite(source, offset, byteCount)
 
   override fun writeAll(source: Source): Long = commonWriteAll(source)
 
   actual override fun write(source: Source, byteCount: Long): Buffer =
-    commonWrite(source, byteCount)
+      commonWrite(source, byteCount)
 
   actual override fun writeByte(b: Int): Buffer = commonWriteByte(b)
 
@@ -190,7 +185,7 @@ actual class Buffer : BufferedSource, BufferedSink {
   actual override fun writeDecimalLong(v: Long): Buffer = commonWriteDecimalLong(v)
 
   actual override fun writeHexadecimalUnsignedLong(v: Long): Buffer =
-    commonWriteHexadecimalUnsignedLong(v)
+      commonWriteHexadecimalUnsignedLong(v)
 
   override fun write(source: Buffer, byteCount: Long): Unit = commonWrite(source, byteCount)
 
@@ -201,7 +196,7 @@ actual class Buffer : BufferedSource, BufferedSink {
   override fun indexOf(b: Byte, fromIndex: Long): Long = indexOf(b, fromIndex, Long.MAX_VALUE)
 
   override fun indexOf(b: Byte, fromIndex: Long, toIndex: Long): Long =
-    commonIndexOf(b, fromIndex, toIndex)
+      commonIndexOf(b, fromIndex, toIndex)
 
   override fun indexOf(bytes: ByteString): Long = indexOf(bytes, 0)
 
@@ -210,23 +205,17 @@ actual class Buffer : BufferedSource, BufferedSink {
   override fun indexOfElement(targetBytes: ByteString): Long = indexOfElement(targetBytes, 0L)
 
   override fun indexOfElement(targetBytes: ByteString, fromIndex: Long): Long =
-    commonIndexOfElement(targetBytes, fromIndex)
+      commonIndexOfElement(targetBytes, fromIndex)
 
   override fun rangeEquals(offset: Long, bytes: ByteString): Boolean =
-    rangeEquals(offset, bytes, 0, bytes.size)
+      rangeEquals(offset, bytes, 0, bytes.size)
 
-  override fun rangeEquals(
-    offset: Long,
-    bytes: ByteString,
-    bytesOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
+  override fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
 
-  override fun flush() {
-  }
+  override fun flush() {}
 
-  override fun close() {
-  }
+  override fun close() {}
 
   override fun timeout(): Timeout = Timeout.NONE
 
@@ -235,8 +224,8 @@ actual class Buffer : BufferedSource, BufferedSink {
   override fun hashCode(): Int = commonHashCode()
 
   /**
-   * Returns a human-readable string that describes the contents of this buffer. Typically this
-   * is a string like `[text=Hello]` or `[hex=0000ffff]`.
+   * Returns a human-readable string that describes the contents of this buffer. Typically this is a
+   * string like `[text=Hello]` or `[hex=0000ffff]`.
    */
   override fun toString() = snapshot().toString()
 

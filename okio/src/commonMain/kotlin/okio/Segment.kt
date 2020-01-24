@@ -20,8 +20,8 @@ import kotlin.jvm.JvmField
 /**
  * A segment of a buffer.
  *
- * Each segment in a buffer is a circularly-linked list node referencing the following and
- * preceding segments in the buffer.
+ * Each segment in a buffer is a circularly-linked list node referencing the following and preceding
+ * segments in the buffer.
  *
  * Each segment in the pool is a singly-linked list node referencing the rest of segments in the
  * pool.
@@ -29,28 +29,28 @@ import kotlin.jvm.JvmField
  * The underlying byte arrays of segments may be shared between buffers and byte strings. When a
  * segment's byte array is shared the segment may not be recycled, nor may its byte data be changed.
  * The lone exception is that the owner segment is allowed to append to the segment, writing data at
- * `limit` and beyond. There is a single owning segment for each byte array. Positions,
- * limits, prev, and next references are not shared.
+ * `limit` and beyond. There is a single owning segment for each byte array. Positions, limits,
+ * prev, and next references are not shared.
  */
 internal class Segment {
   @JvmField val data: ByteArray
 
-  /** The next byte of application data byte to read in this segment.  */
+  /** The next byte of application data byte to read in this segment. */
   @JvmField var pos: Int = 0
 
-  /** The first byte of available data ready to be written to.  */
+  /** The first byte of available data ready to be written to. */
   @JvmField var limit: Int = 0
 
-  /** True if other segments or byte strings use the same byte array.  */
+  /** True if other segments or byte strings use the same byte array. */
   @JvmField var shared: Boolean = false
 
-  /** True if this segment owns the byte array and can append to it, extending `limit`.  */
+  /** True if this segment owns the byte array and can append to it, extending `limit`. */
   @JvmField var owner: Boolean = false
 
-  /** Next segment in a linked or circularly-linked list.  */
+  /** Next segment in a linked or circularly-linked list. */
   @JvmField var next: Segment? = null
 
-  /** Previous segment in a circularly-linked list.  */
+  /** Previous segment in a circularly-linked list. */
   @JvmField var prev: Segment? = null
 
   constructor() {
@@ -77,12 +77,12 @@ internal class Segment {
     return Segment(data, pos, limit, true, false)
   }
 
-  /** Returns a new segment that its own private copy of the underlying byte array.  */
+  /** Returns a new segment that its own private copy of the underlying byte array. */
   fun unsharedCopy() = Segment(data.copyOf(), pos, limit, false, true)
 
   /**
-   * Removes this segment of a circularly-linked list and returns its successor.
-   * Returns null if the list is now empty.
+   * Removes this segment of a circularly-linked list and returns its successor. Returns null if the
+   * list is now empty.
    */
   fun pop(): Segment? {
     val result = if (next !== this) next else null
@@ -149,7 +149,7 @@ internal class Segment {
     SegmentPool.recycle(this)
   }
 
-  /** Moves `byteCount` bytes from this segment to `sink`.  */
+  /** Moves `byteCount` bytes from this segment to `sink`. */
   fun writeTo(sink: Segment, byteCount: Int) {
     check(sink.owner) { "only owner can write" }
     if (sink.limit + byteCount > SIZE) {
@@ -161,17 +161,17 @@ internal class Segment {
       sink.pos = 0
     }
 
-    data.copyInto(sink.data, destinationOffset = sink.limit, startIndex = pos,
-        endIndex = pos + byteCount)
+    data.copyInto(
+        sink.data, destinationOffset = sink.limit, startIndex = pos, endIndex = pos + byteCount)
     sink.limit += byteCount
     pos += byteCount
   }
 
   companion object {
-    /** The size of all segments in bytes.  */
+    /** The size of all segments in bytes. */
     const val SIZE = 8192
 
-    /** Segments will be shared when doing so avoids `arraycopy()` of this many bytes.  */
+    /** Segments will be shared when doing so avoids `arraycopy()` of this many bytes. */
     const val SHARE_MINIMUM = 1024
   }
 }

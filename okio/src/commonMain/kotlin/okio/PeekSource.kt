@@ -25,9 +25,7 @@ package okio
  * validates against on every read. If the upstream buffer is read from, this source will become
  * invalid and throw [IllegalStateException] on any future reads.
  */
-internal class PeekSource(
-  private val upstream: BufferedSource
-) : Source {
+internal class PeekSource(private val upstream: BufferedSource) : Source {
   private val buffer = upstream.buffer
   private var expectedSegment = buffer.head
   private var expectedPos = buffer.head?.pos ?: -1
@@ -40,8 +38,9 @@ internal class PeekSource(
     check(!closed) { "closed" }
     // Source becomes invalid if there is an expected Segment and it and the expected position
     // do not match the current head and head position of the upstream buffer
-    check(expectedSegment == null ||
-      expectedSegment === buffer.head && expectedPos == buffer.head!!.pos) {
+    check(
+        expectedSegment == null ||
+            expectedSegment === buffer.head && expectedPos == buffer.head!!.pos) {
       "Peek source is invalid because upstream source was used"
     }
     if (byteCount == 0L) return 0L

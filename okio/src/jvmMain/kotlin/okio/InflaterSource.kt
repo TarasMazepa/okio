@@ -16,7 +16,6 @@
 
 @file:JvmName("-InflaterSourceExtensions")
 @file:Suppress("NOTHING_TO_INLINE") // Aliases to public API.
-
 package okio
 
 import java.io.EOFException
@@ -29,11 +28,12 @@ import java.util.zip.Inflater
  * another source.
  */
 class InflaterSource
-/**
- * This internal constructor shares a buffer with its trusted caller. In general we can't share a
- * `BufferedSource` because the inflater holds input bytes until they are inflated.
- */
-internal constructor(private val source: BufferedSource, private val inflater: Inflater) : Source {
+    /**
+     * This internal constructor shares a buffer with its trusted caller. In general we can't share
+     * a `BufferedSource` because the inflater holds input bytes until they are inflated.
+     */
+    internal constructor(
+        private val source: BufferedSource, private val inflater: Inflater) : Source {
 
   /**
    * When we call Inflater.setInput(), the inflater keeps our byte array until it needs input again.
@@ -100,7 +100,7 @@ internal constructor(private val source: BufferedSource, private val inflater: I
     return false
   }
 
-  /** When the inflater has processed compressed data, remove it from the buffer.  */
+  /** When the inflater has processed compressed data, remove it from the buffer. */
   private fun releaseInflatedBytes() {
     if (bufferBytesHeldByInflater == 0) return
     val toRelease = bufferBytesHeldByInflater - inflater.remaining

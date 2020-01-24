@@ -16,7 +16,6 @@
 package okio
 
 import java.util.Random
-
 import okio.TestUtil.bufferWithRandomSegmentLayout
 import okio.TestUtil.bufferWithSegments
 
@@ -26,20 +25,17 @@ enum class BufferFactory {
       return Buffer()
     }
   },
-
   SMALL_BUFFER {
     override fun newBuffer(): Buffer {
       return Buffer().writeUtf8("abcde")
     }
   },
-
   SMALL_SEGMENTED_BUFFER {
     @Throws(Exception::class)
     override fun newBuffer(): Buffer {
       return bufferWithSegments("abc", "defg", "hijkl")
     }
   },
-
   LARGE_BUFFER {
     @Throws(Exception::class)
     override fun newBuffer(): Buffer {
@@ -50,7 +46,6 @@ enum class BufferFactory {
       return Buffer().write(largeByteArray)
     }
   },
-
   LARGE_BUFFER_WITH_RANDOM_LAYOUT {
     @Throws(Exception::class)
     override fun newBuffer(): Buffer {

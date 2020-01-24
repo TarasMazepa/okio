@@ -24,10 +24,10 @@ import okio.internal.commonSubstring
 import okio.internal.commonToByteArray
 import okio.internal.commonWrite
 
-internal actual class SegmentedByteString internal actual constructor(
-  internal actual val segments: Array<ByteArray>,
-  internal actual val directory: IntArray
-) : ByteString(EMPTY.data) {
+internal actual class SegmentedByteString
+    internal actual constructor(
+        internal actual val segments: Array<ByteArray>, internal actual val directory: IntArray) :
+    ByteString(EMPTY.data) {
 
   override fun base64() = toByteString().base64()
 
@@ -40,7 +40,7 @@ internal actual class SegmentedByteString internal actual constructor(
   override fun base64Url() = toByteString().base64Url()
 
   override fun substring(beginIndex: Int, endIndex: Int): ByteString =
-    commonSubstring(beginIndex, endIndex)
+      commonSubstring(beginIndex, endIndex)
 
   override fun internalGet(pos: Int): Byte = commonInternalGet(pos)
 
@@ -49,30 +49,20 @@ internal actual class SegmentedByteString internal actual constructor(
   override fun toByteArray(): ByteArray = commonToByteArray()
 
   override fun write(buffer: Buffer, offset: Int, byteCount: Int): Unit =
-    commonWrite(buffer, offset, byteCount)
+      commonWrite(buffer, offset, byteCount)
 
-  override fun rangeEquals(
-    offset: Int,
-    other: ByteString,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  override fun rangeEquals(offset: Int, other: ByteString, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
-  override fun rangeEquals(
-    offset: Int,
-    other: ByteArray,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  override fun rangeEquals(offset: Int, other: ByteArray, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
   override fun indexOf(other: ByteArray, fromIndex: Int) = toByteString().indexOf(other, fromIndex)
 
-  override fun lastIndexOf(other: ByteArray, fromIndex: Int) = toByteString().lastIndexOf(
-    other,
-    fromIndex
-  )
+  override fun lastIndexOf(other: ByteArray, fromIndex: Int) = toByteString()
+          .lastIndexOf(other, fromIndex)
 
-  /** Returns a copy as a non-segmented byte string.  */
+  /** Returns a copy as a non-segmented byte string. */
   private fun toByteString() = ByteString(toByteArray())
 
   override fun internalArray() = toByteArray()

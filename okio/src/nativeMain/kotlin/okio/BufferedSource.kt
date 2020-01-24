@@ -92,7 +92,8 @@ actual interface BufferedSource : Source {
 
   actual fun rangeEquals(offset: Long, bytes: ByteString): Boolean
 
-  actual fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int): Boolean
+  actual fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int):
+      Boolean
 
   actual fun peek(): BufferedSource
 }

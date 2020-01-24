@@ -75,7 +75,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
 
   override fun buffer() = this
 
-  actual override val buffer get() = this
+  actual override val buffer
+    get() = this
 
   override fun outputStream(): OutputStream {
     return object : OutputStream() {
@@ -137,11 +138,7 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   /** Copy `byteCount` bytes from this, starting at `offset`, to `out`. */
   @Throws(IOException::class)
   @JvmOverloads
-  fun copyTo(
-    out: OutputStream,
-    offset: Long = 0L,
-    byteCount: Long = size - offset
-  ): Buffer {
+  fun copyTo(out: OutputStream, offset: Long = 0L, byteCount: Long = size - offset): Buffer {
     var offset = offset
     var byteCount = byteCount
     checkOffsetAndCount(size, offset, byteCount)
@@ -167,18 +164,12 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
     return this
   }
 
-  actual fun copyTo(
-    out: Buffer,
-    offset: Long,
-    byteCount: Long
-  ): Buffer = commonCopyTo(out, offset, byteCount)
+  actual fun copyTo(out: Buffer, offset: Long, byteCount: Long): Buffer =
+      commonCopyTo(out, offset, byteCount)
 
-  actual fun copyTo(
-    out: Buffer,
-    offset: Long
-  ): Buffer = copyTo(out, offset, size - offset)
+  actual fun copyTo(out: Buffer, offset: Long): Buffer = copyTo(out, offset, size - offset)
 
-  /** Write `byteCount` bytes from this to `out`.  */
+  /** Write `byteCount` bytes from this to `out`. */
   @Throws(IOException::class)
   @JvmOverloads
   fun writeTo(out: OutputStream, byteCount: Long = size): Buffer {
@@ -205,14 +196,14 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
     return this
   }
 
-  /** Read and exhaust bytes from `input` into this.  */
+  /** Read and exhaust bytes from `input` into this. */
   @Throws(IOException::class)
   fun readFrom(input: InputStream): Buffer {
     readFrom(input, Long.MAX_VALUE, true)
     return this
   }
 
-  /** Read `byteCount` bytes from `input` into this.  */
+  /** Read `byteCount` bytes from `input` into this. */
   @Throws(IOException::class)
   fun readFrom(input: InputStream, byteCount: Long): Buffer {
     require(byteCount >= 0) { "byteCount < 0: $byteCount" }
@@ -341,7 +332,7 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   override fun readFully(sink: ByteArray) = commonReadFully(sink)
 
   override fun read(sink: ByteArray, offset: Int, byteCount: Int): Int =
-    commonRead(sink, offset, byteCount)
+      commonRead(sink, offset, byteCount)
 
   @Throws(IOException::class)
   override fun read(sink: ByteBuffer): Int {
@@ -369,25 +360,21 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   actual override fun write(byteString: ByteString): Buffer = commonWrite(byteString)
 
   actual override fun write(byteString: ByteString, offset: Int, byteCount: Int) =
-    commonWrite(byteString, offset, byteCount)
+      commonWrite(byteString, offset, byteCount)
 
   actual override fun writeUtf8(string: String): Buffer = writeUtf8(string, 0, string.length)
 
   actual override fun writeUtf8(string: String, beginIndex: Int, endIndex: Int): Buffer =
-    commonWriteUtf8(string, beginIndex, endIndex)
+      commonWriteUtf8(string, beginIndex, endIndex)
 
   actual override fun writeUtf8CodePoint(codePoint: Int): Buffer =
-    commonWriteUtf8CodePoint(codePoint)
+      commonWriteUtf8CodePoint(codePoint)
 
-  override fun writeString(string: String, charset: Charset) = writeString(string, 0, string.length,
-      charset)
+  override fun writeString(string: String, charset: Charset) =
+      writeString(string, 0, string.length, charset)
 
-  override fun writeString(
-    string: String,
-    beginIndex: Int,
-    endIndex: Int,
-    charset: Charset
-  ): Buffer {
+  override fun writeString(string: String, beginIndex: Int, endIndex: Int, charset: Charset):
+      Buffer {
     require(beginIndex >= 0) { "beginIndex < 0: $beginIndex" }
     require(endIndex >= beginIndex) { "endIndex < beginIndex: $endIndex < $beginIndex" }
     require(endIndex <= string.length) { "endIndex > string.length: $endIndex > ${string.length}" }
@@ -398,11 +385,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
 
   actual override fun write(source: ByteArray): Buffer = commonWrite(source)
 
-  actual override fun write(
-    source: ByteArray,
-    offset: Int,
-    byteCount: Int
-  ): Buffer = commonWrite(source, offset, byteCount)
+  actual override fun write(source: ByteArray, offset: Int, byteCount: Int): Buffer =
+      commonWrite(source, offset, byteCount)
 
   @Throws(IOException::class)
   override fun write(source: ByteBuffer): Int {
@@ -427,7 +411,7 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
 
   @Throws(IOException::class)
   actual override fun write(source: Source, byteCount: Long): Buffer =
-    commonWrite(source, byteCount)
+      commonWrite(source, byteCount)
 
   actual override fun writeByte(b: Int): Buffer = commonWriteByte(b)
 
@@ -446,10 +430,10 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   actual override fun writeDecimalLong(v: Long): Buffer = commonWriteDecimalLong(v)
 
   actual override fun writeHexadecimalUnsignedLong(v: Long): Buffer =
-    commonWriteHexadecimalUnsignedLong(v)
+      commonWriteHexadecimalUnsignedLong(v)
 
   internal actual fun writableSegment(minimumCapacity: Int): Segment =
-    commonWritableSegment(minimumCapacity)
+      commonWritableSegment(minimumCapacity)
 
   override fun write(source: Buffer, byteCount: Long): Unit = commonWrite(source, byteCount)
 
@@ -463,7 +447,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    */
   override fun indexOf(b: Byte, fromIndex: Long) = indexOf(b, fromIndex, Long.MAX_VALUE)
 
-  override fun indexOf(b: Byte, fromIndex: Long, toIndex: Long): Long = commonIndexOf(b, fromIndex, toIndex)
+  override fun indexOf(b: Byte, fromIndex: Long, toIndex: Long): Long =
+      commonIndexOf(b, fromIndex, toIndex)
 
   @Throws(IOException::class)
   override fun indexOf(bytes: ByteString): Long = indexOf(bytes, 0)
@@ -474,17 +459,13 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   override fun indexOfElement(targetBytes: ByteString) = indexOfElement(targetBytes, 0L)
 
   override fun indexOfElement(targetBytes: ByteString, fromIndex: Long): Long =
-    commonIndexOfElement(targetBytes, fromIndex)
+      commonIndexOfElement(targetBytes, fromIndex)
 
   override fun rangeEquals(offset: Long, bytes: ByteString) =
-    rangeEquals(offset, bytes, 0, bytes.size)
+      rangeEquals(offset, bytes, 0, bytes.size)
 
-  override fun rangeEquals(
-    offset: Long,
-    bytes: ByteString,
-    bytesOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
+  override fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
 
   override fun flush() {}
 
@@ -494,16 +475,16 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
 
   override fun timeout() = Timeout.NONE
 
-  /** Returns the 128-bit MD5 hash of this buffer.  */
+  /** Returns the 128-bit MD5 hash of this buffer. */
   fun md5() = digest("MD5")
 
-  /** Returns the 160-bit SHA-1 hash of this buffer.  */
+  /** Returns the 160-bit SHA-1 hash of this buffer. */
   fun sha1() = digest("SHA-1")
 
-  /** Returns the 256-bit SHA-256 hash of this buffer.  */
+  /** Returns the 256-bit SHA-256 hash of this buffer. */
   fun sha256() = digest("SHA-256")
 
-  /** Returns the 512-bit SHA-512 hash of this buffer.  */
+  /** Returns the 512-bit SHA-512 hash of this buffer. */
   fun sha512() = digest("SHA-512")
 
   private fun digest(algorithm: String): ByteString {
@@ -519,13 +500,13 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
     return ByteString(messageDigest.digest())
   }
 
-  /** Returns the 160-bit SHA-1 HMAC of this buffer.  */
+  /** Returns the 160-bit SHA-1 HMAC of this buffer. */
   fun hmacSha1(key: ByteString) = hmac("HmacSHA1", key)
 
-  /** Returns the 256-bit SHA-256 HMAC of this buffer.  */
+  /** Returns the 256-bit SHA-256 HMAC of this buffer. */
   fun hmacSha256(key: ByteString) = hmac("HmacSHA256", key)
 
-  /** Returns the 512-bit SHA-512 HMAC of this buffer.  */
+  /** Returns the 512-bit SHA-512 HMAC of this buffer. */
   fun hmacSha512(key: ByteString) = hmac("HmacSHA512", key)
 
   private fun hmac(algorithm: String, key: ByteString): ByteString {
@@ -551,8 +532,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
   override fun hashCode(): Int = commonHashCode()
 
   /**
-   * Returns a human-readable string that describes the contents of this buffer. Typically this
-   * is a string like `[text=Hello]` or `[hex=0000ffff]`.
+   * Returns a human-readable string that describes the contents of this buffer. Typically this is a
+   * string like `[text=Hello]` or `[hex=0000ffff]`.
    */
   override fun toString() = snapshot().toString()
 
@@ -565,7 +546,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
 
   actual fun snapshot(byteCount: Int): ByteString = commonSnapshot(byteCount)
 
-  @JvmOverloads fun readUnsafe(unsafeCursor: UnsafeCursor = UnsafeCursor()): UnsafeCursor {
+  @JvmOverloads
+  fun readUnsafe(unsafeCursor: UnsafeCursor = UnsafeCursor()): UnsafeCursor {
     check(unsafeCursor.buffer == null) { "already attached to a buffer" }
 
     unsafeCursor.buffer = this
@@ -601,21 +583,19 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    * its own invariants. Instead, it assumes a careful user who has studied Okio's implementation
    * details and their consequences.
    *
-   * Buffer Internals
-   * ----------------
+   * Buffer Internals ----------------
    *
-   * Most code should use `Buffer` as a black box: a class that holds 0 or more bytes of
-   * data with efficient APIs to append data to the end and to consume data from the front. Usually
-   * this is also the most efficient way to use buffers because it allows Okio to employ several
+   * Most code should use `Buffer` as a black box: a class that holds 0 or more bytes of data with
+   * efficient APIs to append data to the end and to consume data from the front. Usually this is
+   * also the most efficient way to use buffers because it allows Okio to employ several
    * optimizations, including:
    *
-   *
-   *  * **Fast Allocation:** Buffers use a shared pool of memory that is not zero-filled before use.
-   *  * **Fast Resize:** A buffer's capacity can change without copying its contents.
-   *  * **Fast Move:** Memory ownership can be reassigned from one buffer to another.
-   *  * **Fast Copy:** Multiple buffers can share the same underlying memory.
-   *  * **Fast Encoding and Decoding:** Common operations like UTF-8 encoding and decimal decoding
-   *    do not require intermediate objects to be allocated.
+   * * **Fast Allocation:** Buffers use a shared pool of memory that is not zero-filled before use.
+   * * **Fast Resize:** A buffer's capacity can change without copying its contents. * **Fast
+   * Move:** Memory ownership can be reassigned from one buffer to another. * **Fast Copy:**
+   * Multiple buffers can share the same underlying memory. * **Fast Encoding and Decoding:** Common
+   * operations like UTF-8 encoding and decimal decoding do not require intermediate objects to be
+   * allocated.
    *
    * These optimizations all leverage the way Okio stores data internally. Okio Buffers are
    * implemented using a doubly-linked list of segments. Each segment is a contiguous range within a
@@ -625,51 +605,34 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    *
    * New buffers are empty and have no segments:
    *
-   * ```
-   *   val buffer = Buffer()
-   * ```
+   * ``` val buffer = Buffer() ```
    *
    * We append 7 bytes of data to the end of our empty buffer. Internally, the buffer allocates a
    * segment and writes its new data there. The lone segment has an 8 KiB byte array but only 7
    * bytes of data:
    *
-   * ```
-   * buffer.writeUtf8("sealion")
+   * ``` buffer.writeUtf8("sealion")
    *
-   * // [ 's', 'e', 'a', 'l', 'i', 'o', 'n', '?', '?', '?', ...]
-   * //    ^                                  ^
-   * // start = 0                          end = 7
-   * ```
+   * // [ 's', 'e', 'a', 'l', 'i', 'o', 'n', '?', '?', '?', ...] // ^ ^ // start = 0 end = 7 ```
    *
    * When we read 4 bytes of data from the buffer, it finds its first segment and returns that data
    * to us. As bytes are read the data is consumed. The segment tracks this by adjusting its
    * internal indices.
    *
-   * ```
-   * buffer.readUtf8(4) // "seal"
+   * ``` buffer.readUtf8(4) // "seal"
    *
-   * // [ 's', 'e', 'a', 'l', 'i', 'o', 'n', '?', '?', '?', ...]
-   * //                        ^              ^
-   * //                     start = 4      end = 7
-   * ```
+   * // [ 's', 'e', 'a', 'l', 'i', 'o', 'n', '?', '?', '?', ...] // ^ ^ // start = 4 end = 7 ```
    *
    * As we write data into a buffer we fill up its internal segments. When a write doesn't fit into
    * a buffer's last segment, additional segments are allocated and appended to the linked list of
    * segments. Each segment has its own start and end indexes tracking where the user's data begins
    * and ends.
    *
-   * ```
-   * val xoxo = new Buffer()
-   * xoxo.writeUtf8("xo".repeat(5_000))
+   * ``` val xoxo = new Buffer() xoxo.writeUtf8("xo".repeat(5_000))
    *
-   * // [ 'x', 'o', 'x', 'o', 'x', 'o', 'x', 'o', ..., 'x', 'o', 'x', 'o']
-   * //    ^                                                               ^
-   * // start = 0                                                      end = 8192
-   * //
-   * // [ 'x', 'o', 'x', 'o', ..., 'x', 'o', 'x', 'o', '?', '?', '?', ...]
-   * //    ^                                            ^
-   * // start = 0                                   end = 1808
-   * ```
+   * // [ 'x', 'o', 'x', 'o', 'x', 'o', 'x', 'o', ..., 'x', 'o', 'x', 'o'] // ^ ^ // start = 0 end =
+   * 8192 // // [ 'x', 'o', 'x', 'o', ..., 'x', 'o', 'x', 'o', '?', '?', '?', ...] // ^ ^ // start =
+   * 0 end = 1808 ```
    *
    * The start index is always **inclusive** and the end index is always **exclusive**. The data
    * preceding the start index is undefined, and the data at and following the end index is
@@ -682,45 +645,28 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    * you may see its effects. In this example, one of the "xoxo" segments above is reused in an
    * unrelated buffer:
    *
-   * ```
-   * val abc = new Buffer()
-   * abc.writeUtf8("abc")
+   * ``` val abc = new Buffer() abc.writeUtf8("abc")
    *
-   * // [ 'a', 'b', 'c', 'o', 'x', 'o', 'x', 'o', ...]
-   * //    ^              ^
-   * // start = 0     end = 3
-   * ```
+   * // [ 'a', 'b', 'c', 'o', 'x', 'o', 'x', 'o', ...] // ^ ^ // start = 0 end = 3 ```
    *
    * There is an optimization in `Buffer.clone()` and other methods that allows two segments to
    * share the same underlying byte array. Clones can't write to the shared byte array; instead they
    * allocate a new (private) segment early.
    *
-   * ```
-   * val nana = new Buffer()
-   * nana.writeUtf8("na".repeat(2_500))
-   * nana.readUtf8(2) // "na"
+   * ``` val nana = new Buffer() nana.writeUtf8("na".repeat(2_500)) nana.readUtf8(2) // "na"
    *
-   * // [ 'n', 'a', 'n', 'a', ..., 'n', 'a', 'n', 'a', '?', '?', '?', ...]
-   * //              ^                                  ^
-   * //           start = 2                         end = 5000
+   * // [ 'n', 'a', 'n', 'a', ..., 'n', 'a', 'n', 'a', '?', '?', '?', ...] // ^ ^ // start = 2 end =
+   * 5000
    *
-   * nana2 = nana.clone()
-   * nana2.writeUtf8("batman")
+   * nana2 = nana.clone() nana2.writeUtf8("batman")
    *
-   * // [ 'n', 'a', 'n', 'a', ..., 'n', 'a', 'n', 'a', '?', '?', '?', ...]
-   * //              ^                                  ^
-   * //           start = 2                         end = 5000
-   * //
-   * // [ 'b', 'a', 't', 'm', 'a', 'n', '?', '?', '?', ...]
-   * //    ^                             ^
-   * //  start = 0                    end = 6
-   * ```
+   * // [ 'n', 'a', 'n', 'a', ..., 'n', 'a', 'n', 'a', '?', '?', '?', ...] // ^ ^ // start = 2 end =
+   * 5000 // // [ 'b', 'a', 't', 'm', 'a', 'n', '?', '?', '?', ...] // ^ ^ // start = 0 end = 6 ```
    *
    * Segments are not shared when the shared region is small (ie. less than 1 KiB). This is intended
    * to prevent fragmentation in sharing-heavy use cases.
    *
-   * Unsafe Cursor API
-   * -----------------
+   * Unsafe Cursor API -----------------
    *
    * This class exposes privileged access to the internal byte arrays of a buffer. A cursor either
    * references the data of a single segment, it is before the first segment (`offset == -1`), or it
@@ -730,37 +676,27 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    * After seeking, [UnsafeCursor.data] references the segment's internal byte array,
    * [UnsafeCursor.start] is the segment's start and [UnsafeCursor.end] is its end.
    *
-   *
    * Call [UnsafeCursor.next] to advance the cursor to the next segment. This returns -1 if there
    * are no further segments in the buffer.
    *
-   *
    * Use [Buffer.readUnsafe] to create a cursor to read buffer data and [Buffer.readAndWriteUnsafe]
    * to create a cursor to read and write buffer data. In either case, always call
-   * [UnsafeCursor.close] when done with a cursor. This is convenient with Kotlin's
-   * [use] extension function. In this example we read all of the bytes in a buffer into a byte
-   * array:
+   * [UnsafeCursor.close] when done with a cursor. This is convenient with Kotlin's [use] extension
+   * function. In this example we read all of the bytes in a buffer into a byte array:
    *
-   * ```
-   * val bufferBytes = ByteArray(buffer.size.toInt())
+   * ``` val bufferBytes = ByteArray(buffer.size.toInt())
    *
-   * buffer.readUnsafe().use { cursor ->
-   *   while (cursor.next() != -1) {
-   *     System.arraycopy(cursor.data, cursor.start,
-   *         bufferBytes, cursor.offset.toInt(), cursor.end - cursor.start);
-   *   }
-   * }
-   * ```
+   * buffer.readUnsafe().use { cursor -> while (cursor.next() != -1) { System.arraycopy(cursor.data,
+   * cursor.start, bufferBytes, cursor.offset.toInt(), cursor.end - cursor.start); } } ```
    *
-   * Change the capacity of a buffer with [resizeBuffer]. This is only permitted for
-   * read+write cursors. The buffer's size always changes from the end: shrinking it removes bytes
-   * from the end; growing it adds capacity to the end.
+   * Change the capacity of a buffer with [resizeBuffer]. This is only permitted for read+write
+   * cursors. The buffer's size always changes from the end: shrinking it removes bytes from the
+   * end; growing it adds capacity to the end.
    *
-   * Warnings
-   * --------
+   * Warnings --------
    *
-   * Most application developers should avoid this API. Those that must use this API should
-   * respect these warnings.
+   * Most application developers should avoid this API. Those that must use this API should respect
+   * these warnings.
    *
    * **Don't mutate a cursor.** This class has public, non-final fields because that is convenient
    * for low-level I/O frameworks. Never assign values to these fields; instead use the cursor API
@@ -785,9 +721,9 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
    * will change with advances in hardware. Future versions of Okio may even have heterogeneous
    * segment sizes.
    *
-   * These warnings are intended to help you to use this API safely. It's here for developers
-   * that need absolutely the most throughput. Since that's you, here's one final performance tip.
-   * You can reuse instances of this class if you like. Use the overloads of [Buffer.readUnsafe] and
+   * These warnings are intended to help you to use this API safely. It's here for developers that
+   * need absolutely the most throughput. Since that's you, here's one final performance tip. You
+   * can reuse instances of this class if you like. Use the overloads of [Buffer.readUnsafe] and
    * [Buffer.readAndWriteUnsafe] that take a cursor and close it after use.
    */
   class UnsafeCursor : Closeable {
@@ -811,9 +747,8 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
     }
 
     /**
-     * Reposition the cursor so that the data at `offset` is readable at `data[start]`.
-     * Returns the number of bytes readable in `data` (at least 1), or -1 if there are no data
-     * to read.
+     * Reposition the cursor so that the data at `offset` is readable at `data[start]`. Returns the
+     * number of bytes readable in `data` (at least 1), or -1 if there are no data to read.
      */
     fun seek(offset: Long): Int {
       val buffer = checkNotNull(buffer) { "not attached to a buffer" }
@@ -889,19 +824,18 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
     }
 
     /**
-     * Change the size of the buffer so that it equals `newSize` by either adding new
-     * capacity at the end or truncating the buffer at the end. Newly added capacity may span
-     * multiple segments.
+     * Change the size of the buffer so that it equals `newSize` by either adding new capacity at
+     * the end or truncating the buffer at the end. Newly added capacity may span multiple segments.
      *
      * As a side-effect this cursor will [seek][UnsafeCursor.seek]. If the buffer is being enlarged
      * it will move [UnsafeCursor.offset] to the first byte of newly-added capacity. This is the
-     * size of the buffer prior to the `resizeBuffer()` call. If the buffer is being shrunk it will move
-     * [UnsafeCursor.offset] to the end of the buffer.
+     * size of the buffer prior to the `resizeBuffer()` call. If the buffer is being shrunk it will
+     * move [UnsafeCursor.offset] to the end of the buffer.
      *
      * Warning: it is the caller’s responsibility to write new data to every byte of the
-     * newly-allocated capacity. Failure to do so may cause serious security problems as the data
-     * in the returned buffers is not zero filled. Buffers may contain dirty pooled segments that
-     * hold very sensitive data from other parts of the current process.
+     * newly-allocated capacity. Failure to do so may cause serious security problems as the data in
+     * the returned buffers is not zero filled. Buffers may contain dirty pooled segments that hold
+     * very sensitive data from other parts of the current process.
      *
      * @return the previous size of the buffer.
      */
@@ -967,9 +901,9 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
      * [offset][UnsafeCursor.offset] to the first byte of newly-added capacity. This is the size of
      * the buffer prior to the `expandBuffer()` call.
      *
-     * If `minByteCount` bytes are available in the buffer's current tail segment that will
-     * be used; otherwise another segment will be allocated and appended. In either case this
-     * returns the number of bytes of capacity added to this buffer.
+     * If `minByteCount` bytes are available in the buffer's current tail segment that will be used;
+     * otherwise another segment will be allocated and appended. In either case this returns the
+     * number of bytes of capacity added to this buffer.
      *
      * Warning: it is the caller’s responsibility to either write new data to every byte of the
      * newly-allocated capacity, or to [shrink][UnsafeCursor.resizeBuffer] the buffer to the data
@@ -978,7 +912,7 @@ actual class Buffer : BufferedSource, BufferedSink, Cloneable, ByteChannel {
      * sensitive data from other parts of the current process.
      *
      * @param minByteCount the size of the contiguous capacity. Must be positive and not greater
-     * than the capacity size of a single segment (8 KiB).
+     *     than the capacity size of a single segment (8 KiB).
      * @return the number of bytes expanded by. Not less than `minByteCount`.
      */
     fun expandBuffer(minByteCount: Int): Long {

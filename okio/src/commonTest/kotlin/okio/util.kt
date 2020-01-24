@@ -21,7 +21,6 @@ import kotlin.test.assertEquals
 fun Char.repeat(count: Int): String {
   return toString().repeat(count)
 }
-
 fun segmentSizes(buffer: Buffer): List<Int> {
   var segment = buffer.head ?: return emptyList()
 
@@ -33,18 +32,15 @@ fun segmentSizes(buffer: Buffer): List<Int> {
   }
   return sizes
 }
-
 fun assertArrayEquals(a: ByteArray, b: ByteArray) {
   assertEquals(a.contentToString(), b.contentToString())
 }
-
 fun randomBytes(length: Int): ByteString {
   val random = Random(0)
   val randomBytes = ByteArray(length)
   random.nextBytes(randomBytes)
   return ByteString.of(*randomBytes)
 }
-
 fun bufferWithRandomSegmentLayout(dice: Random, data: ByteArray): Buffer {
   val result = Buffer()
 
@@ -68,7 +64,6 @@ fun bufferWithRandomSegmentLayout(dice: Random, data: ByteArray): Buffer {
 
   return result
 }
-
 fun bufferWithSegments(vararg segments: String): Buffer {
   val result = Buffer()
   for (s in segments) {
@@ -81,7 +76,6 @@ fun bufferWithSegments(vararg segments: String): Buffer {
   }
   return result
 }
-
 fun makeSegments(source: ByteString): ByteString {
   val buffer = Buffer()
   for (i in 0 until source.size) {

@@ -18,7 +18,6 @@
 package okio
 
 internal actual fun ByteArray.toUtf8String(): String = String(this, Charsets.UTF_8)
-
 internal actual fun String.asUtf8ToByteArray(): ByteArray = toByteArray(Charsets.UTF_8)
 
 // TODO remove if https://youtrack.jetbrains.com/issue/KT-20641 provides a better solution
@@ -27,7 +26,6 @@ actual typealias ArrayIndexOutOfBoundsException = java.lang.ArrayIndexOutOfBound
 internal actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
   return kotlin.synchronized(lock, block)
 }
-
 actual typealias IOException = java.io.IOException
 
 actual typealias EOFException = java.io.EOFException

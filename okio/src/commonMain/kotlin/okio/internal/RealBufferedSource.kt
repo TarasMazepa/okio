@@ -16,7 +16,6 @@
 
 // TODO move to RealBufferedSource class: https://youtrack.jetbrains.com/issue/KT-20427
 @file:Suppress("NOTHING_TO_INLINE")
-
 package okio.internal
 
 import okio.Buffer
@@ -43,16 +42,13 @@ internal inline fun RealBufferedSource.commonRead(sink: Buffer, byteCount: Long)
   val toRead = minOf(byteCount, buffer.size)
   return buffer.read(sink, toRead)
 }
-
 internal inline fun RealBufferedSource.commonExhausted(): Boolean {
   check(!closed) { "closed" }
   return buffer.exhausted() && source.read(buffer, Segment.SIZE.toLong()) == -1L
 }
-
 internal inline fun RealBufferedSource.commonRequire(byteCount: Long) {
   if (!request(byteCount)) throw EOFException()
 }
-
 internal inline fun RealBufferedSource.commonRequest(byteCount: Long): Boolean {
   require(byteCount >= 0) { "byteCount < 0: $byteCount" }
   check(!closed) { "closed" }
@@ -61,22 +57,18 @@ internal inline fun RealBufferedSource.commonRequest(byteCount: Long): Boolean {
   }
   return true
 }
-
 internal inline fun RealBufferedSource.commonReadByte(): Byte {
   require(1)
   return buffer.readByte()
 }
-
 internal inline fun RealBufferedSource.commonReadByteString(): ByteString {
   buffer.writeAll(source)
   return buffer.readByteString()
 }
-
 internal inline fun RealBufferedSource.commonReadByteString(byteCount: Long): ByteString {
   require(byteCount)
   return buffer.readByteString(byteCount)
 }
-
 internal inline fun RealBufferedSource.commonSelect(options: Options): Int {
   check(!closed) { "closed" }
 
@@ -99,17 +91,14 @@ internal inline fun RealBufferedSource.commonSelect(options: Options): Int {
     }
   }
 }
-
 internal inline fun RealBufferedSource.commonReadByteArray(): ByteArray {
   buffer.writeAll(source)
   return buffer.readByteArray()
 }
-
 internal inline fun RealBufferedSource.commonReadByteArray(byteCount: Long): ByteArray {
   require(byteCount)
   return buffer.readByteArray(byteCount)
 }
-
 internal inline fun RealBufferedSource.commonReadFully(sink: ByteArray) {
   try {
     require(sink.size.toLong())
@@ -126,8 +115,8 @@ internal inline fun RealBufferedSource.commonReadFully(sink: ByteArray) {
 
   buffer.readFully(sink)
 }
-
-internal inline fun RealBufferedSource.commonRead(sink: ByteArray, offset: Int, byteCount: Int): Int {
+internal inline fun RealBufferedSource.commonRead(sink: ByteArray, offset: Int, byteCount: Int):
+    Int {
   checkOffsetAndCount(sink.size.toLong(), offset.toLong(), byteCount.toLong())
 
   if (buffer.size == 0L) {
@@ -138,7 +127,6 @@ internal inline fun RealBufferedSource.commonRead(sink: ByteArray, offset: Int, 
   val toRead = okio.minOf(byteCount, buffer.size).toInt()
   return buffer.read(sink, offset, toRead)
 }
-
 internal inline fun RealBufferedSource.commonReadFully(sink: Buffer, byteCount: Long) {
   try {
     require(byteCount)
@@ -150,7 +138,6 @@ internal inline fun RealBufferedSource.commonReadFully(sink: Buffer, byteCount: 
 
   buffer.readFully(sink, byteCount)
 }
-
 internal inline fun RealBufferedSource.commonReadAll(sink: Sink): Long {
   var totalBytesWritten: Long = 0
   while (source.read(buffer, Segment.SIZE.toLong()) != -1L) {
@@ -166,17 +153,14 @@ internal inline fun RealBufferedSource.commonReadAll(sink: Sink): Long {
   }
   return totalBytesWritten
 }
-
 internal inline fun RealBufferedSource.commonReadUtf8(): String {
   buffer.writeAll(source)
   return buffer.readUtf8()
 }
-
 internal inline fun RealBufferedSource.commonReadUtf8(byteCount: Long): String {
   require(byteCount)
   return buffer.readUtf8(byteCount)
 }
-
 internal inline fun RealBufferedSource.commonReadUtf8Line(): String? {
   val newline = indexOf('\n'.toByte())
 
@@ -190,26 +174,22 @@ internal inline fun RealBufferedSource.commonReadUtf8Line(): String? {
     buffer.readUtf8Line(newline)
   }
 }
-
 internal inline fun RealBufferedSource.commonReadUtf8LineStrict(limit: Long): String {
   require(limit >= 0) { "limit < 0: $limit" }
   val scanLength = if (limit == Long.MAX_VALUE) Long.MAX_VALUE else limit + 1
   val newline = indexOf('\n'.toByte(), 0, scanLength)
   if (newline != -1L) return buffer.readUtf8Line(newline)
-  if (scanLength < Long.MAX_VALUE &&
-    request(scanLength) && buffer[scanLength - 1] == '\r'.toByte() &&
-    request(scanLength + 1) && buffer[scanLength] == '\n'.toByte()
-  ) {
+  if (scanLength < Long.MAX_VALUE && request(scanLength) &&
+      buffer[scanLength - 1] == '\r'.toByte() && request(scanLength + 1) &&
+      buffer[scanLength] == '\n'.toByte()) {
     return buffer.readUtf8Line(scanLength) // The line was 'limit' UTF-8 bytes followed by \r\n.
   }
   val data = Buffer()
   buffer.copyTo(data, 0, okio.minOf(32, buffer.size))
   throw EOFException(
-    "\\n not found: limit=" + minOf(buffer.size, limit) +
-      " content=" + data.readByteString().hex() + '…'.toString()
-  )
+      "\\n not found: limit=" + minOf(buffer.size, limit) + " content=" + data.readByteString()
+              .hex() + '…'.toString())
 }
-
 internal inline fun RealBufferedSource.commonReadUtf8CodePoint(): Int {
   require(1)
 
@@ -222,37 +202,30 @@ internal inline fun RealBufferedSource.commonReadUtf8CodePoint(): Int {
 
   return buffer.readUtf8CodePoint()
 }
-
 internal inline fun RealBufferedSource.commonReadShort(): Short {
   require(2)
   return buffer.readShort()
 }
-
 internal inline fun RealBufferedSource.commonReadShortLe(): Short {
   require(2)
   return buffer.readShortLe()
 }
-
 internal inline fun RealBufferedSource.commonReadInt(): Int {
   require(4)
   return buffer.readInt()
 }
-
 internal inline fun RealBufferedSource.commonReadIntLe(): Int {
   require(4)
   return buffer.readIntLe()
 }
-
 internal inline fun RealBufferedSource.commonReadLong(): Long {
   require(8)
   return buffer.readLong()
 }
-
 internal inline fun RealBufferedSource.commonReadLongLe(): Long {
   require(8)
   return buffer.readLongLe()
 }
-
 internal inline fun RealBufferedSource.commonReadDecimalLong(): Long {
   require(1)
 
@@ -262,7 +235,8 @@ internal inline fun RealBufferedSource.commonReadDecimalLong(): Long {
     if ((b < '0'.toByte() || b > '9'.toByte()) && (pos != 0L || b != '-'.toByte())) {
       // Non-digit, or non-leading negative sign.
       if (pos == 0L) {
-        throw NumberFormatException("Expected leading [0-9] or '-' character but was 0x${b.toString(16)}")
+        throw NumberFormatException(
+            "Expected leading [0-9] or '-' character but was 0x${b.toString(16)}")
       }
       break
     }
@@ -271,20 +245,18 @@ internal inline fun RealBufferedSource.commonReadDecimalLong(): Long {
 
   return buffer.readDecimalLong()
 }
-
 internal inline fun RealBufferedSource.commonReadHexadecimalUnsignedLong(): Long {
   require(1)
 
   var pos = 0
   while (request((pos + 1).toLong())) {
     val b = buffer[pos.toLong()]
-    if ((b < '0'.toByte() || b > '9'.toByte()) &&
-      (b < 'a'.toByte() || b > 'f'.toByte()) &&
-      (b < 'A'.toByte() || b > 'F'.toByte())
-    ) {
+    if ((b < '0'.toByte() || b > '9'.toByte()) && (b < 'a'.toByte() || b > 'f'.toByte()) &&
+        (b < 'A'.toByte() || b > 'F'.toByte())) {
       // Non-digit, or non-leading negative sign.
       if (pos == 0) {
-        throw NumberFormatException("Expected leading [0-9a-fA-F] character but was 0x${b.toString(16)}")
+        throw NumberFormatException(
+            "Expected leading [0-9a-fA-F] character but was 0x${b.toString(16)}")
       }
       break
     }
@@ -293,7 +265,6 @@ internal inline fun RealBufferedSource.commonReadHexadecimalUnsignedLong(): Long
 
   return buffer.readHexadecimalUnsignedLong()
 }
-
 internal inline fun RealBufferedSource.commonSkip(byteCount: Long) {
   var byteCount = byteCount
   check(!closed) { "closed" }
@@ -306,8 +277,8 @@ internal inline fun RealBufferedSource.commonSkip(byteCount: Long) {
     byteCount -= toSkip
   }
 }
-
-internal inline fun RealBufferedSource.commonIndexOf(b: Byte, fromIndex: Long, toIndex: Long): Long {
+internal inline fun RealBufferedSource.commonIndexOf(b: Byte, fromIndex: Long, toIndex: Long):
+    Long {
   var fromIndex = fromIndex
   check(!closed) { "closed" }
   require(fromIndex in 0L..toIndex) { "fromIndex=$fromIndex toIndex=$toIndex" }
@@ -326,7 +297,6 @@ internal inline fun RealBufferedSource.commonIndexOf(b: Byte, fromIndex: Long, t
   }
   return -1L
 }
-
 internal inline fun RealBufferedSource.commonIndexOf(bytes: ByteString, fromIndex: Long): Long {
   var fromIndex = fromIndex
   check(!closed) { "closed" }
@@ -342,8 +312,9 @@ internal inline fun RealBufferedSource.commonIndexOf(bytes: ByteString, fromInde
     fromIndex = maxOf(fromIndex, lastBufferSize - bytes.size + 1)
   }
 }
-
-internal inline fun RealBufferedSource.commonIndexOfElement(targetBytes: ByteString, fromIndex: Long): Long {
+internal inline fun RealBufferedSource.commonIndexOfElement(
+    targetBytes: ByteString, fromIndex: Long
+): Long {
   var fromIndex = fromIndex
   check(!closed) { "closed" }
 
@@ -358,20 +329,12 @@ internal inline fun RealBufferedSource.commonIndexOfElement(targetBytes: ByteStr
     fromIndex = maxOf(fromIndex, lastBufferSize)
   }
 }
-
 internal inline fun RealBufferedSource.commonRangeEquals(
-  offset: Long,
-  bytes: ByteString,
-  bytesOffset: Int,
-  byteCount: Int
+    offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int
 ): Boolean {
   check(!closed) { "closed" }
 
-  if (offset < 0L ||
-    bytesOffset < 0 ||
-    byteCount < 0 ||
-    bytes.size - bytesOffset < byteCount
-  ) {
+  if (offset < 0L || bytesOffset < 0 || byteCount < 0 || bytes.size - bytesOffset < byteCount) {
     return false
   }
   for (i in 0 until byteCount) {
@@ -381,18 +344,14 @@ internal inline fun RealBufferedSource.commonRangeEquals(
   }
   return true
 }
-
 internal inline fun RealBufferedSource.commonPeek(): BufferedSource {
   return PeekSource(this).buffer()
 }
-
 internal inline fun RealBufferedSource.commonClose() {
   if (closed) return
   closed = true
   source.close()
   buffer.clear()
 }
-
 internal inline fun RealBufferedSource.commonTimeout() = source.timeout()
-
 internal inline fun RealBufferedSource.commonToString() = "buffer($source)"

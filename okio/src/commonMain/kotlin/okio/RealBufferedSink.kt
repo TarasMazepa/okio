@@ -16,9 +16,7 @@
 
 package okio
 
-internal expect class RealBufferedSink(
-  sink: Sink
-) : BufferedSink {
+internal expect class RealBufferedSink(sink: Sink) : BufferedSink {
   val sink: Sink
   var closed: Boolean
 }

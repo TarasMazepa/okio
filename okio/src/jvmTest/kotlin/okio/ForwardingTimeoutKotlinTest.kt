@@ -20,7 +20,8 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class ForwardingTimeoutKotlinTest {
-  @Test fun getAndSetDelegate() {
+  @Test
+  fun getAndSetDelegate() {
     val timeout1 = Timeout()
     val timeout2 = Timeout()
 

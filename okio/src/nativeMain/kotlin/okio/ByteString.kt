@@ -43,10 +43,8 @@ import okio.internal.commonToString
 import okio.internal.commonUtf8
 import okio.internal.commonWrite
 
-actual open class ByteString
-internal actual constructor(
-  internal actual val data: ByteArray
-) : Comparable<ByteString> {
+actual open class ByteString internal actual constructor(internal actual val data: ByteArray) :
+    Comparable<ByteString> {
   @Suppress("SetterBackingFieldAssignment")
   internal actual var hashCode: Int = 0 // 0 if unknown.
     set(value) {
@@ -71,7 +69,7 @@ internal actual constructor(
   actual open fun toAsciiUppercase(): ByteString = commonToAsciiUppercase()
 
   actual open fun substring(beginIndex: Int, endIndex: Int): ByteString =
-    commonSubstring(beginIndex, endIndex)
+      commonSubstring(beginIndex, endIndex)
 
   internal actual open fun internalGet(pos: Int) = commonGetByte(pos)
 
@@ -87,21 +85,13 @@ internal actual constructor(
   internal actual open fun internalArray() = commonInternalArray()
 
   internal actual open fun write(buffer: Buffer, offset: Int, byteCount: Int) =
-    commonWrite(buffer, offset, byteCount)
+      commonWrite(buffer, offset, byteCount)
 
-  actual open fun rangeEquals(
-    offset: Int,
-    other: ByteString,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  actual open fun rangeEquals(offset: Int, other: ByteString, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
-  actual open fun rangeEquals(
-    offset: Int,
-    other: ByteArray,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  actual open fun rangeEquals(offset: Int, other: ByteArray, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
   actual fun startsWith(prefix: ByteString) = commonStartsWith(prefix)
 
@@ -117,7 +107,8 @@ internal actual constructor(
 
   actual fun lastIndexOf(other: ByteString, fromIndex: Int) = commonLastIndexOf(other, fromIndex)
 
-  actual open fun lastIndexOf(other: ByteArray, fromIndex: Int) = commonLastIndexOf(other, fromIndex)
+  actual open fun lastIndexOf(other: ByteArray, fromIndex: Int) =
+      commonLastIndexOf(other, fromIndex)
 
   actual override fun equals(other: Any?) = commonEquals(other)
 
@@ -137,7 +128,7 @@ internal actual constructor(
     actual fun of(vararg data: Byte) = commonOf(data)
 
     actual fun ByteArray.toByteString(offset: Int, byteCount: Int): ByteString =
-      commonToByteString(offset, byteCount)
+        commonToByteString(offset, byteCount)
 
     actual fun String.encodeUtf8(): ByteString = commonEncodeUtf8()
 

@@ -16,7 +16,6 @@
 
 // TODO move to Buffer class: https://youtrack.jetbrains.com/issue/KT-20427
 @file:Suppress("NOTHING_TO_INLINE")
-
 package okio.internal
 
 import okio.Buffer
@@ -38,7 +37,7 @@ import okio.toHexString
 internal val HEX_DIGIT_BYTES = "0123456789abcdef".asUtf8ToByteArray()
 
 // Threshold determined empirically via ReadByteStringBenchmark
-/** Create SegmentedByteString when size is greater than this many bytes.  */
+/** Create SegmentedByteString when size is greater than this many bytes. */
 internal const val SEGMENTING_THRESHOLD = 4096
 
 /**
@@ -46,11 +45,7 @@ internal const val SEGMENTING_THRESHOLD = 4096
  * `bytes[bytesOffset..bytesLimit)`.
  */
 internal fun rangeEquals(
-  segment: Segment,
-  segmentPos: Int,
-  bytes: ByteArray,
-  bytesOffset: Int,
-  bytesLimit: Int
+    segment: Segment, segmentPos: Int, bytes: ByteArray, bytesOffset: Int, bytesLimit: Int
 ): Boolean {
   var segment = segment
   var segmentPos = segmentPos
@@ -76,7 +71,6 @@ internal fun rangeEquals(
 
   return true
 }
-
 internal fun Buffer.readUtf8Line(newline: Long): String {
   return when {
     newline > 0 && this[newline - 1] == '\r'.toByte() -> {
@@ -98,10 +92,7 @@ internal fun Buffer.readUtf8Line(newline: Long): String {
  * Invoke `lambda` with the segment and offset at `fromIndex`. Searches from the front or the back
  * depending on what's closer to `fromIndex`.
  */
-internal inline fun <T> Buffer.seek(
-  fromIndex: Long,
-  lambda: (Segment?, Long) -> T
-): T {
+internal inline fun <T> Buffer.seek(fromIndex: Long, lambda: (Segment?, Long) -> T): T {
   var s: Segment = head ?: return lambda(null, -1L)
 
   if (size - fromIndex < fromIndex) {
@@ -127,15 +118,15 @@ internal inline fun <T> Buffer.seek(
 
 /**
  * Returns the index of a value in options that is a prefix of this buffer. Returns -1 if no value
- * is found. This method does two simultaneous iterations: it iterates the trie and it iterates
- * this buffer. It returns when it reaches a result in the trie, when it mismatches in the trie,
- * and when the buffer is exhausted.
+ * is found. This method does two simultaneous iterations: it iterates the trie and it iterates this
+ * buffer. It returns when it reaches a result in the trie, when it mismatches in the trie, and when
+ * the buffer is exhausted.
  *
  * @param selectTruncated true to return -2 if a possible result is present but truncated. For
- *     example, this will return -2 if the buffer contains [ab] and the options are [abc, abd].
- *     Note that this is made complicated by the fact that options are listed in preference order,
- *     and one option may be a prefix of another. For example, this returns -2 if the buffer
- *     contains [ab] and the options are [abc, a].
+ *     example, this will return -2 if the buffer contains [ab] and the options are [abc, abd]. Note
+ *     that this is made complicated by the fact that options are listed in preference order, and
+ *     one option may be a prefix of another. For example, this returns -2 if the buffer contains
+ *     [ab] and the options are [abc, a].
  */
 internal fun Buffer.selectPrefix(options: Options, selectTruncated: Boolean = false): Int {
   val head = head ?: return if (selectTruncated) -2 else -1
@@ -150,8 +141,7 @@ internal fun Buffer.selectPrefix(options: Options, selectTruncated: Boolean = fa
 
   var prefixIndex = -1
 
-  navigateTrie@
-  while (true) {
+  navigateTrie@ while (true) {
     val scanOrSelect = trie[triePos++]
 
     val possiblePrefixIndex = trie[triePos++]
@@ -229,11 +219,7 @@ internal fun Buffer.selectPrefix(options: Options, selectTruncated: Boolean = fa
 // TODO Kotlin's expect classes can't have default implementations, so platform implementations
 // have to call these functions. Remove all this nonsense when expect class allow actual code.
 
-internal inline fun Buffer.commonCopyTo(
-  out: Buffer,
-  offset: Long,
-  byteCount: Long
-): Buffer {
+internal inline fun Buffer.commonCopyTo(out: Buffer, offset: Long, byteCount: Long): Buffer {
   var offset = offset
   var byteCount = byteCount
   checkOffsetAndCount(size, offset, byteCount)
@@ -267,7 +253,6 @@ internal inline fun Buffer.commonCopyTo(
 
   return this
 }
-
 internal inline fun Buffer.commonCompleteSegmentByteCount(): Long {
   var result = size
   if (result == 0L) return 0L
@@ -280,7 +265,6 @@ internal inline fun Buffer.commonCompleteSegmentByteCount(): Long {
 
   return result
 }
-
 internal inline fun Buffer.commonReadByte(): Byte {
   if (size == 0L) throw EOFException()
 
@@ -301,7 +285,6 @@ internal inline fun Buffer.commonReadByte(): Byte {
 
   return b
 }
-
 internal inline fun Buffer.commonReadShort(): Short {
   if (size < 2L) throw EOFException()
 
@@ -328,7 +311,6 @@ internal inline fun Buffer.commonReadShort(): Short {
 
   return s.toShort()
 }
-
 internal inline fun Buffer.commonReadInt(): Int {
   if (size < 4L) throw EOFException()
 
@@ -338,17 +320,15 @@ internal inline fun Buffer.commonReadInt(): Int {
 
   // If the int is split across multiple segments, delegate to readByte().
   if (limit - pos < 4L) {
-    return (readByte() and 0xff shl 24
-      or (readByte() and 0xff shl 16)
-      or (readByte() and 0xff shl 8) // ktlint-disable no-multi-spaces
-      or (readByte() and 0xff))
+    return (readByte() and 0xff shl 24 or (readByte() and 0xff shl 16) or
+        (readByte() and 0xff shl 8) // ktlint-disable no-multi-spaces
+    or (readByte() and 0xff))
   }
 
   val data = segment.data
-  val i = (data[pos++] and 0xff shl 24
-    or (data[pos++] and 0xff shl 16)
-    or (data[pos++] and 0xff shl 8)
-    or (data[pos++] and 0xff))
+  val i =
+      (data[pos++] and 0xff shl 24 or (data[pos++] and 0xff shl 16) or
+          (data[pos++] and 0xff shl 8) or (data[pos++] and 0xff))
   size -= 4L
 
   if (pos == limit) {
@@ -360,7 +340,6 @@ internal inline fun Buffer.commonReadInt(): Int {
 
   return i
 }
-
 internal inline fun Buffer.commonReadLong(): Long {
   if (size < 8L) throw EOFException()
 
@@ -370,19 +349,16 @@ internal inline fun Buffer.commonReadLong(): Long {
 
   // If the long is split across multiple segments, delegate to readInt().
   if (limit - pos < 8L) {
-    return (readInt() and 0xffffffffL shl 32
-      or (readInt() and 0xffffffffL))
+    return (readInt() and 0xffffffffL shl 32 or (readInt() and 0xffffffffL))
   }
 
   val data = segment.data
-  val v = (data[pos++] and 0xffL shl 56
-    or (data[pos++] and 0xffL shl 48)
-    or (data[pos++] and 0xffL shl 40)
-    or (data[pos++] and 0xffL shl 32)
-    or (data[pos++] and 0xffL shl 24)
-    or (data[pos++] and 0xffL shl 16)
-    or (data[pos++] and 0xffL shl 8) // ktlint-disable no-multi-spaces
-    or (data[pos++] and 0xffL))
+  val v =
+      (data[pos++] and 0xffL shl 56 or (data[pos++] and 0xffL shl 48) or
+          (data[pos++] and 0xffL shl 40) or (data[pos++] and 0xffL shl 32) or
+          (data[pos++] and 0xffL shl 24) or (data[pos++] and 0xffL shl 16) or
+          (data[pos++] and 0xffL shl 8) // ktlint-disable no-multi-spaces
+      or (data[pos++] and 0xffL))
   size -= 8L
 
   if (pos == limit) {
@@ -394,16 +370,13 @@ internal inline fun Buffer.commonReadLong(): Long {
 
   return v
 }
-
 internal inline fun Buffer.commonGet(pos: Long): Byte {
   checkOffsetAndCount(size, pos, 1L)
   seek(pos) { s, offset ->
     return s!!.data[(s.pos + pos - offset).toInt()]
   }
 }
-
 internal inline fun Buffer.commonClear() = skip(size)
-
 internal inline fun Buffer.commonSkip(byteCount: Long) {
   var byteCount = byteCount
   while (byteCount > 0) {
@@ -420,16 +393,12 @@ internal inline fun Buffer.commonSkip(byteCount: Long) {
     }
   }
 }
-
 internal inline fun Buffer.commonWrite(
-  byteString: ByteString,
-  offset: Int = 0,
-  byteCount: Int = byteString.size
+    byteString: ByteString, offset: Int = 0, byteCount: Int = byteString.size
 ): Buffer {
   byteString.write(this, offset, byteCount)
   return this
 }
-
 internal inline fun Buffer.commonWriteDecimalLong(v: Long): Buffer {
   var v = v
   if (v == 0L) {
@@ -448,33 +417,13 @@ internal inline fun Buffer.commonWriteDecimalLong(v: Long): Buffer {
 
   // Binary search for character width which favors matching lower numbers.
   var width =
-    if (v < 100000000L)
-      if (v < 10000L)
-        if (v < 100L)
-          if (v < 10L) 1
-          else 2
-        else if (v < 1000L) 3
-        else 4
-      else if (v < 1000000L)
-        if (v < 100000L) 5
-        else 6
-      else if (v < 10000000L) 7
-      else 8
-    else if (v < 1000000000000L)
-      if (v < 10000000000L)
-        if (v < 1000000000L) 9
-        else 10
-      else if (v < 100000000000L) 11
-      else 12
-    else if (v < 1000000000000000L)
-      if (v < 10000000000000L) 13
-      else if (v < 100000000000000L) 14
-      else 15
-    else if (v < 100000000000000000L)
-      if (v < 10000000000000000L) 16
-      else 17
-    else if (v < 1000000000000000000L) 18
-    else 19
+      if (v < 100000000L) if (v < 10000L) if (v < 100L) if (v < 10L) 1 else 2 else if (v <
+          1000L) 3 else 4 else if (v < 1000000L) if (v < 100000L) 5 else 6 else if (v <
+          10000000L) 7 else 8 else if (v < 1000000000000L) if (v < 10000000000L) if (v <
+          1000000000L) 9 else 10 else if (v < 100000000000L) 11 else 12 else if (v <
+          1000000000000000L) if (v < 10000000000000L) 13 else if (v <
+          100000000000000L) 14 else 15 else if (v < 100000000000000000L) if (v <
+          10000000000000000L) 16 else 17 else if (v < 1000000000000000000L) 18 else 19
   if (negative) {
     ++width
   }
@@ -495,7 +444,6 @@ internal inline fun Buffer.commonWriteDecimalLong(v: Long): Buffer {
   this.size += width.toLong()
   return this
 }
-
 internal inline fun Buffer.commonWriteHexadecimalUnsignedLong(v: Long): Buffer {
   var v = v
   if (v == 0L) {
@@ -538,7 +486,6 @@ internal inline fun Buffer.commonWriteHexadecimalUnsignedLong(v: Long): Buffer {
   size += width.toLong()
   return this
 }
-
 internal inline fun Buffer.commonWritableSegment(minimumCapacity: Int): Segment {
   require(minimumCapacity >= 1 && minimumCapacity <= Segment.SIZE) { "unexpected capacity" }
 
@@ -556,14 +503,8 @@ internal inline fun Buffer.commonWritableSegment(minimumCapacity: Int): Segment 
   }
   return tail
 }
-
 internal inline fun Buffer.commonWrite(source: ByteArray) = write(source, 0, source.size)
-
-internal inline fun Buffer.commonWrite(
-  source: ByteArray,
-  offset: Int,
-  byteCount: Int
-): Buffer {
+internal inline fun Buffer.commonWrite(source: ByteArray, offset: Int, byteCount: Int): Buffer {
   var offset = offset
   checkOffsetAndCount(source.size.toLong(), offset.toLong(), byteCount.toLong())
 
@@ -576,8 +517,7 @@ internal inline fun Buffer.commonWrite(
         destination = tail.data,
         destinationOffset = tail.limit,
         startIndex = offset,
-        endIndex = offset + toCopy
-    )
+        endIndex = offset + toCopy)
 
     offset += toCopy
     tail.limit += toCopy
@@ -586,9 +526,7 @@ internal inline fun Buffer.commonWrite(
   size += byteCount.toLong()
   return this
 }
-
 internal inline fun Buffer.commonReadByteArray() = readByteArray(size)
-
 internal inline fun Buffer.commonReadByteArray(byteCount: Long): ByteArray {
   require(byteCount >= 0 && byteCount <= Int.MAX_VALUE) { "byteCount: $byteCount" }
   if (size < byteCount) throw EOFException()
@@ -597,9 +535,7 @@ internal inline fun Buffer.commonReadByteArray(byteCount: Long): ByteArray {
   readFully(result)
   return result
 }
-
 internal inline fun Buffer.commonRead(sink: ByteArray) = read(sink, 0, sink.size)
-
 internal inline fun Buffer.commonReadFully(sink: ByteArray) {
   var offset = 0
   while (offset < sink.size) {
@@ -608,15 +544,17 @@ internal inline fun Buffer.commonReadFully(sink: ByteArray) {
     offset += read
   }
 }
-
 internal inline fun Buffer.commonRead(sink: ByteArray, offset: Int, byteCount: Int): Int {
   checkOffsetAndCount(sink.size.toLong(), offset.toLong(), byteCount.toLong())
 
   val s = head ?: return -1
   val toCopy = minOf(byteCount, s.limit - s.pos)
-  s.data.copyInto(
-      destination = sink, destinationOffset = offset, startIndex = s.pos, endIndex = s.pos + toCopy
-  )
+  s.data
+      .copyInto(
+          destination = sink,
+          destinationOffset = offset,
+          startIndex = s.pos,
+          endIndex = s.pos + toCopy)
 
   s.pos += toCopy
   size -= toCopy.toLong()
@@ -669,7 +607,7 @@ internal inline fun Buffer.commonReadDecimalLong(): Long {
       } else {
         if (seen == 0) {
           throw NumberFormatException(
-            "Expected leading [0-9] or '-' character but was 0x${b.toHexString()}")
+              "Expected leading [0-9] or '-' character but was 0x${b.toHexString()}")
         }
         // Set a flag to stop iteration. We still need to run through segment updating below.
         done = true
@@ -690,7 +628,6 @@ internal inline fun Buffer.commonReadDecimalLong(): Long {
   size -= seen.toLong()
   return if (negative) value else -value
 }
-
 internal inline fun Buffer.commonReadHexadecimalUnsignedLong(): Long {
   if (size == 0L) throw EOFException()
 
@@ -718,7 +655,7 @@ internal inline fun Buffer.commonReadHexadecimalUnsignedLong(): Long {
       } else {
         if (seen == 0) {
           throw NumberFormatException(
-            "Expected leading [0-9a-fA-F] character but was 0x${b.toHexString()}")
+              "Expected leading [0-9a-fA-F] character but was 0x${b.toHexString()}")
         }
         // Set a flag to stop iteration. We still need to run through segment updating below.
         done = true
@@ -748,9 +685,7 @@ internal inline fun Buffer.commonReadHexadecimalUnsignedLong(): Long {
   size -= seen.toLong()
   return value
 }
-
 internal inline fun Buffer.commonReadByteString(): ByteString = readByteString(size)
-
 internal inline fun Buffer.commonReadByteString(byteCount: Long): ByteString {
   require(byteCount >= 0 && byteCount <= Int.MAX_VALUE) { "byteCount: $byteCount" }
   if (size < byteCount) throw EOFException()
@@ -761,7 +696,6 @@ internal inline fun Buffer.commonReadByteString(byteCount: Long): ByteString {
     return ByteString(readByteArray(byteCount))
   }
 }
-
 internal inline fun Buffer.commonSelect(options: Options): Int {
   val index = selectPrefix(options)
   if (index == -1) return -1
@@ -771,7 +705,6 @@ internal inline fun Buffer.commonSelect(options: Options): Int {
   skip(selectedSize.toLong())
   return index
 }
-
 internal inline fun Buffer.commonReadFully(sink: Buffer, byteCount: Long) {
   if (size < byteCount) {
     sink.write(this, size) // Exhaust ourselves.
@@ -779,7 +712,6 @@ internal inline fun Buffer.commonReadFully(sink: Buffer, byteCount: Long) {
   }
   sink.write(this, byteCount)
 }
-
 internal inline fun Buffer.commonReadAll(sink: Sink): Long {
   val byteCount = size
   if (byteCount > 0L) {
@@ -787,7 +719,6 @@ internal inline fun Buffer.commonReadAll(sink: Sink): Long {
   }
   return byteCount
 }
-
 internal inline fun Buffer.commonReadUtf8(byteCount: Long): String {
   require(byteCount >= 0 && byteCount <= Int.MAX_VALUE) { "byteCount: $byteCount" }
   if (size < byteCount) throw EOFException()
@@ -811,7 +742,6 @@ internal inline fun Buffer.commonReadUtf8(byteCount: Long): String {
 
   return result
 }
-
 internal inline fun Buffer.commonReadUtf8Line(): String? {
   val newline = indexOf('\n'.toByte())
 
@@ -821,23 +751,20 @@ internal inline fun Buffer.commonReadUtf8Line(): String? {
     else -> null
   }
 }
-
 internal inline fun Buffer.commonReadUtf8LineStrict(limit: Long): String {
   require(limit >= 0L) { "limit < 0: $limit" }
   val scanLength = if (limit == Long.MAX_VALUE) Long.MAX_VALUE else limit + 1L
   val newline = indexOf('\n'.toByte(), 0L, scanLength)
   if (newline != -1L) return readUtf8Line(newline)
-  if (scanLength < size &&
-    this[scanLength - 1] == '\r'.toByte() &&
-    this[scanLength] == '\n'.toByte()) {
+  if (scanLength < size && this[scanLength - 1] == '\r'.toByte() &&
+      this[scanLength] == '\n'.toByte()) {
     return readUtf8Line(scanLength) // The line was 'limit' UTF-8 bytes followed by \r\n.
   }
   val data = Buffer()
   copyTo(data, 0, minOf(32, size))
-  throw EOFException("\\n not found: limit=${minOf(size,
-    limit)} content=${data.readByteString().hex()}${'…'}")
+  throw EOFException(
+      "\\n not found: limit=${minOf(size, limit)} content=${data.readByteString().hex()}${'…'}")
 }
-
 internal inline fun Buffer.commonReadUtf8CodePoint(): Int {
   if (size == 0L) throw EOFException()
 
@@ -879,7 +806,8 @@ internal inline fun Buffer.commonReadUtf8CodePoint(): Int {
   }
 
   if (size < byteCount) {
-    throw EOFException("size < $byteCount: $size (to read code point prefixed 0x${b0.toHexString()})")
+    throw EOFException(
+        "size < $byteCount: $size (to read code point prefixed 0x${b0.toHexString()})")
   }
 
   // Read the continuation bytes. If we encounter a non-continuation byte, the sequence consumed
@@ -912,7 +840,6 @@ internal inline fun Buffer.commonReadUtf8CodePoint(): Int {
     else -> codePoint
   }
 }
-
 internal inline fun Buffer.commonWriteUtf8(string: String, beginIndex: Int, endIndex: Int): Buffer {
   require(beginIndex >= 0) { "beginIndex < 0: $beginIndex" }
   require(endIndex >= beginIndex) { "endIndex < beginIndex: $endIndex < $beginIndex" }
@@ -945,32 +872,29 @@ internal inline fun Buffer.commonWriteUtf8(string: String, beginIndex: Int, endI
         tail.limit += runSize
         size += runSize.toLong()
       }
-
       c < 0x800 -> {
         // Emit a 11-bit character with 2 bytes.
         val tail = writableSegment(2)
         /* ktlint-disable no-multi-spaces */
-        tail.data[tail.limit    ] = (c shr 6          or 0xc0).toByte() // 110xxxxx
-        tail.data[tail.limit + 1] = (c       and 0x3f or 0x80).toByte() // 10xxxxxx
+        tail.data[tail.limit] = (c shr 6 or 0xc0).toByte() // 110xxxxx
+        tail.data[tail.limit + 1] = (c and 0x3f or 0x80).toByte() // 10xxxxxx
         /* ktlint-enable no-multi-spaces */
         tail.limit += 2
         size += 2L
         i++
       }
-
       c < 0xd800 || c > 0xdfff -> {
         // Emit a 16-bit character with 3 bytes.
         val tail = writableSegment(3)
         /* ktlint-disable no-multi-spaces */
-        tail.data[tail.limit    ] = (c shr 12          or 0xe0).toByte() // 1110xxxx
-        tail.data[tail.limit + 1] = (c shr  6 and 0x3f or 0x80).toByte() // 10xxxxxx
-        tail.data[tail.limit + 2] = (c        and 0x3f or 0x80).toByte() // 10xxxxxx
+        tail.data[tail.limit] = (c shr 12 or 0xe0).toByte() // 1110xxxx
+        tail.data[tail.limit + 1] = (c shr 6 and 0x3f or 0x80).toByte() // 10xxxxxx
+        tail.data[tail.limit + 2] = (c and 0x3f or 0x80).toByte() // 10xxxxxx
         /* ktlint-enable no-multi-spaces */
         tail.limit += 3
         size += 3L
         i++
       }
-
       else -> {
         // c is a surrogate. Make sure it is a high surrogate & that its successor is a low
         // surrogate. If not, the UTF-16 is invalid, in which case we emit a replacement
@@ -988,10 +912,10 @@ internal inline fun Buffer.commonWriteUtf8(string: String, beginIndex: Int, endI
           // Emit a 21-bit character with 4 bytes.
           val tail = writableSegment(4)
           /* ktlint-disable no-multi-spaces */
-          tail.data[tail.limit    ] = (codePoint shr 18          or 0xf0).toByte() // 11110xxx
+          tail.data[tail.limit] = (codePoint shr 18 or 0xf0).toByte() // 11110xxx
           tail.data[tail.limit + 1] = (codePoint shr 12 and 0x3f or 0x80).toByte() // 10xxxxxx
-          tail.data[tail.limit + 2] = (codePoint shr  6 and 0x3f or 0x80).toByte() // 10xxyyyy
-          tail.data[tail.limit + 3] = (codePoint        and 0x3f or 0x80).toByte() // 10yyyyyy
+          tail.data[tail.limit + 2] = (codePoint shr 6 and 0x3f or 0x80).toByte() // 10xxyyyy
+          tail.data[tail.limit + 3] = (codePoint and 0x3f or 0x80).toByte() // 10yyyyyy
           /* ktlint-enable no-multi-spaces */
           tail.limit += 4
           size += 4L
@@ -1003,7 +927,6 @@ internal inline fun Buffer.commonWriteUtf8(string: String, beginIndex: Int, endI
 
   return this
 }
-
 internal inline fun Buffer.commonWriteUtf8CodePoint(codePoint: Int): Buffer {
   when {
     codePoint < 0x80 -> {
@@ -1014,8 +937,8 @@ internal inline fun Buffer.commonWriteUtf8CodePoint(codePoint: Int): Buffer {
       // Emit a 11-bit code point with 2 bytes.
       val tail = writableSegment(2)
       /* ktlint-disable no-multi-spaces */
-      tail.data[tail.limit    ] = (codePoint shr 6          or 0xc0).toByte() // 110xxxxx
-      tail.data[tail.limit + 1] = (codePoint       and 0x3f or 0x80).toByte() // 10xxxxxx
+      tail.data[tail.limit] = (codePoint shr 6 or 0xc0).toByte() // 110xxxxx
+      tail.data[tail.limit + 1] = (codePoint and 0x3f or 0x80).toByte() // 10xxxxxx
       /* ktlint-enable no-multi-spaces */
       tail.limit += 2
       size += 2L
@@ -1028,9 +951,9 @@ internal inline fun Buffer.commonWriteUtf8CodePoint(codePoint: Int): Buffer {
       // Emit a 16-bit code point with 3 bytes.
       val tail = writableSegment(3)
       /* ktlint-disable no-multi-spaces */
-      tail.data[tail.limit    ] = (codePoint shr 12          or 0xe0).toByte() // 1110xxxx
-      tail.data[tail.limit + 1] = (codePoint shr  6 and 0x3f or 0x80).toByte() // 10xxxxxx
-      tail.data[tail.limit + 2] = (codePoint        and 0x3f or 0x80).toByte() // 10xxxxxx
+      tail.data[tail.limit] = (codePoint shr 12 or 0xe0).toByte() // 1110xxxx
+      tail.data[tail.limit + 1] = (codePoint shr 6 and 0x3f or 0x80).toByte() // 10xxxxxx
+      tail.data[tail.limit + 2] = (codePoint and 0x3f or 0x80).toByte() // 10xxxxxx
       /* ktlint-enable no-multi-spaces */
       tail.limit += 3
       size += 3L
@@ -1039,10 +962,10 @@ internal inline fun Buffer.commonWriteUtf8CodePoint(codePoint: Int): Buffer {
       // Emit a 21-bit code point with 4 bytes.
       val tail = writableSegment(4)
       /* ktlint-disable no-multi-spaces */
-      tail.data[tail.limit    ] = (codePoint shr 18          or 0xf0).toByte() // 11110xxx
+      tail.data[tail.limit] = (codePoint shr 18 or 0xf0).toByte() // 11110xxx
       tail.data[tail.limit + 1] = (codePoint shr 12 and 0x3f or 0x80).toByte() // 10xxxxxx
-      tail.data[tail.limit + 2] = (codePoint shr  6 and 0x3f or 0x80).toByte() // 10xxyyyy
-      tail.data[tail.limit + 3] = (codePoint        and 0x3f or 0x80).toByte() // 10yyyyyy
+      tail.data[tail.limit + 2] = (codePoint shr 6 and 0x3f or 0x80).toByte() // 10xxyyyy
+      tail.data[tail.limit + 3] = (codePoint and 0x3f or 0x80).toByte() // 10yyyyyy
       /* ktlint-enable no-multi-spaces */
       tail.limit += 4
       size += 4L
@@ -1054,7 +977,6 @@ internal inline fun Buffer.commonWriteUtf8CodePoint(codePoint: Int): Buffer {
 
   return this
 }
-
 internal inline fun Buffer.commonWriteAll(source: Source): Long {
   var totalBytesRead = 0L
   while (true) {
@@ -1064,7 +986,6 @@ internal inline fun Buffer.commonWriteAll(source: Source): Long {
   }
   return totalBytesRead
 }
-
 internal inline fun Buffer.commonWrite(source: Source, byteCount: Long): Buffer {
   var byteCount = byteCount
   while (byteCount > 0L) {
@@ -1074,38 +995,34 @@ internal inline fun Buffer.commonWrite(source: Source, byteCount: Long): Buffer 
   }
   return this
 }
-
 internal inline fun Buffer.commonWriteByte(b: Int): Buffer {
   val tail = writableSegment(1)
   tail.data[tail.limit++] = b.toByte()
   size += 1L
   return this
 }
-
 internal inline fun Buffer.commonWriteShort(s: Int): Buffer {
   val tail = writableSegment(2)
   val data = tail.data
   var limit = tail.limit
   data[limit++] = (s ushr 8 and 0xff).toByte()
-  data[limit++] = (s        and 0xff).toByte() // ktlint-disable no-multi-spaces
+  data[limit++] = (s and 0xff).toByte() // ktlint-disable no-multi-spaces
   tail.limit = limit
   size += 2L
   return this
 }
-
 internal inline fun Buffer.commonWriteInt(i: Int): Buffer {
   val tail = writableSegment(4)
   val data = tail.data
   var limit = tail.limit
   data[limit++] = (i ushr 24 and 0xff).toByte()
   data[limit++] = (i ushr 16 and 0xff).toByte()
-  data[limit++] = (i ushr  8 and 0xff).toByte() // ktlint-disable no-multi-spaces
-  data[limit++] = (i         and 0xff).toByte() // ktlint-disable no-multi-spaces
+  data[limit++] = (i ushr 8 and 0xff).toByte() // ktlint-disable no-multi-spaces
+  data[limit++] = (i and 0xff).toByte() // ktlint-disable no-multi-spaces
   tail.limit = limit
   size += 4L
   return this
 }
-
 internal inline fun Buffer.commonWriteLong(v: Long): Buffer {
   val tail = writableSegment(8)
   val data = tail.data
@@ -1116,13 +1033,12 @@ internal inline fun Buffer.commonWriteLong(v: Long): Buffer {
   data[limit++] = (v ushr 32 and 0xffL).toByte()
   data[limit++] = (v ushr 24 and 0xffL).toByte()
   data[limit++] = (v ushr 16 and 0xffL).toByte()
-  data[limit++] = (v ushr  8 and 0xffL).toByte() // ktlint-disable no-multi-spaces
-  data[limit++] = (v         and 0xffL).toByte() // ktlint-disable no-multi-spaces
+  data[limit++] = (v ushr 8 and 0xffL).toByte() // ktlint-disable no-multi-spaces
+  data[limit++] = (v and 0xffL).toByte() // ktlint-disable no-multi-spaces
   tail.limit = limit
   size += 8L
   return this
 }
-
 internal inline fun Buffer.commonWrite(source: Buffer, byteCount: Long) {
   var byteCount = byteCount
   // Move bytes from the head of the source buffer to the tail of this buffer
@@ -1183,7 +1099,7 @@ internal inline fun Buffer.commonWrite(source: Buffer, byteCount: Long) {
     if (byteCount < source.head!!.limit - source.head!!.pos) {
       val tail = if (head != null) head!!.prev else null
       if (tail != null && tail.owner &&
-        byteCount + tail.limit - (if (tail.shared) 0 else tail.pos) <= Segment.SIZE) {
+          byteCount + tail.limit - (if (tail.shared) 0 else tail.pos) <= Segment.SIZE) {
         // Our existing segments are sufficient. Move bytes from source's head to our tail.
         source.head!!.writeTo(tail, byteCount.toInt())
         source.size -= byteCount
@@ -1214,7 +1130,6 @@ internal inline fun Buffer.commonWrite(source: Buffer, byteCount: Long) {
     byteCount -= movedByteCount
   }
 }
-
 internal inline fun Buffer.commonRead(sink: Buffer, byteCount: Long): Long {
   var byteCount = byteCount
   require(byteCount >= 0) { "byteCount < 0: $byteCount" }
@@ -1223,7 +1138,6 @@ internal inline fun Buffer.commonRead(sink: Buffer, byteCount: Long): Long {
   sink.write(this, byteCount)
   return byteCount
 }
-
 internal inline fun Buffer.commonIndexOf(b: Byte, fromIndex: Long, toIndex: Long): Long {
   var fromIndex = fromIndex
   var toIndex = toIndex
@@ -1257,7 +1171,6 @@ internal inline fun Buffer.commonIndexOf(b: Byte, fromIndex: Long, toIndex: Long
     return -1L
   }
 }
-
 internal inline fun Buffer.commonIndexOf(bytes: ByteString, fromIndex: Long): Long {
   var fromIndex = fromIndex
   require(bytes.size > 0) { "bytes is empty" }
@@ -1292,7 +1205,6 @@ internal inline fun Buffer.commonIndexOf(bytes: ByteString, fromIndex: Long): Lo
     return -1L
   }
 }
-
 internal inline fun Buffer.commonIndexOfElement(targetBytes: ByteString, fromIndex: Long): Long {
   var fromIndex = fromIndex
   require(fromIndex >= 0L) { "fromIndex < 0: $fromIndex" }
@@ -1350,18 +1262,11 @@ internal inline fun Buffer.commonIndexOfElement(targetBytes: ByteString, fromInd
     return -1L
   }
 }
-
 internal inline fun Buffer.commonRangeEquals(
-  offset: Long,
-  bytes: ByteString,
-  bytesOffset: Int,
-  byteCount: Int
+    offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int
 ): Boolean {
-  if (offset < 0L ||
-    bytesOffset < 0 ||
-    byteCount < 0 ||
-    size - offset < byteCount ||
-    bytes.size - bytesOffset < byteCount) {
+  if (offset < 0L || bytesOffset < 0 || byteCount < 0 || size - offset < byteCount ||
+      bytes.size - bytesOffset < byteCount) {
     return false
   }
   for (i in 0 until byteCount) {
@@ -1371,7 +1276,6 @@ internal inline fun Buffer.commonRangeEquals(
   }
   return true
 }
-
 internal inline fun Buffer.commonEquals(other: Any?): Boolean {
   if (this === other) return true
   if (other !is Buffer) return false
@@ -1406,7 +1310,6 @@ internal inline fun Buffer.commonEquals(other: Any?): Boolean {
 
   return true
 }
-
 internal inline fun Buffer.commonHashCode(): Int {
   var s = head ?: return 0
   var result = 1
@@ -1421,7 +1324,6 @@ internal inline fun Buffer.commonHashCode(): Int {
   } while (s !== head)
   return result
 }
-
 internal inline fun Buffer.commonCopy(): Buffer {
   val result = Buffer()
   if (size == 0L) return result
@@ -1443,7 +1345,7 @@ internal inline fun Buffer.commonCopy(): Buffer {
   return result
 }
 
-/** Returns an immutable copy of this buffer as a byte string.  */
+/** Returns an immutable copy of this buffer as a byte string. */
 internal inline fun Buffer.commonSnapshot(): ByteString {
   check(size <= Int.MAX_VALUE) { "size > Int.MAX_VALUE: $size" }
   return snapshot(size.toInt())

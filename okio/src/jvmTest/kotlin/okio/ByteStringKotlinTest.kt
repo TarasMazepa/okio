@@ -25,38 +25,44 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ByteStringKotlinTest {
-  @Test fun arrayToByteString() {
+  @Test
+  fun arrayToByteString() {
     val actual = byteArrayOf(1, 2, 3, 4).toByteString()
     val expected = ByteString.of(1, 2, 3, 4)
     assertEquals(actual, expected)
   }
 
-  @Test fun arraySubsetToByteString() {
+  @Test
+  fun arraySubsetToByteString() {
     val actual = byteArrayOf(1, 2, 3, 4).toByteString(1, 2)
     val expected = ByteString.of(2, 3)
     assertEquals(actual, expected)
   }
 
-  @Test fun byteBufferToByteString() {
+  @Test
+  fun byteBufferToByteString() {
     val actual = ByteBuffer.wrap(byteArrayOf(1, 2, 3, 4)).toByteString()
     val expected = ByteString.of(1, 2, 3, 4)
     assertEquals(actual, expected)
   }
 
-  @Test fun stringEncodeByteStringDefaultCharset() {
+  @Test
+  fun stringEncodeByteStringDefaultCharset() {
     val actual = "a\uD83C\uDF69c".encode()
     val expected = "a\uD83C\uDF69c".encodeUtf8()
     assertEquals(actual, expected)
   }
 
-  @Test fun streamReadByteString() {
+  @Test
+  fun streamReadByteString() {
     val stream = ByteArrayInputStream(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
     val actual = stream.readByteString(4)
     val expected = ByteString.of(1, 2, 3, 4)
     assertEquals(actual, expected)
   }
 
-  @Test fun substring() {
+  @Test
+  fun substring() {
     val byteString = "abcdef".encodeUtf8()
     assertEquals(byteString.substring(), "abcdef".encodeUtf8())
     assertEquals(byteString.substring(endIndex = 3), "abc".encodeUtf8())

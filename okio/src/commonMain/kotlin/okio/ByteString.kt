@@ -25,8 +25,8 @@ import kotlin.jvm.JvmStatic
  * An immutable sequence of bytes.
  *
  * Byte strings compare lexicographically as a sequence of **unsigned** bytes. That is, the byte
- * string `ff` sorts after `00`. This is counter to the sort order of the corresponding bytes,
- * where `-1` sorts before `0`.
+ * string `ff` sorts after `00`. This is counter to the sort order of the corresponding bytes, where
+ * `-1` sorts before `0`.
  *
  * **Full disclosure:** this class provides untrusted input and output streams with raw access to
  * the underlying byte array. A hostile stream implementation could keep a reference to the mutable
@@ -35,14 +35,15 @@ import kotlin.jvm.JvmStatic
  * run both trusted and untrusted code in the same process.
  */
 expect open class ByteString
-// Trusted internal constructor doesn't clone data.
-internal constructor(data: ByteArray) : Comparable<ByteString> {
+    // Trusted internal constructor doesn't clone data.
+    internal constructor(
+        data: ByteArray) : Comparable<ByteString> {
   internal val data: ByteArray
 
   internal var hashCode: Int
   internal var utf8: String?
 
-  /** Constructs a new `String` by decoding the bytes as `UTF-8`.  */
+  /** Constructs a new `String` by decoding the bytes as `UTF-8`. */
   fun utf8(): String
 
   /**
@@ -54,7 +55,7 @@ internal constructor(data: ByteArray) : Comparable<ByteString> {
   /** Returns this byte string encoded as [URL-safe Base64](http://www.ietf.org/rfc/rfc4648.txt). */
   fun base64Url(): String
 
-  /** Returns this byte string encoded in hexadecimal.  */
+  /** Returns this byte string encoded in hexadecimal. */
   fun hex(): String
 
   /**
@@ -78,16 +79,17 @@ internal constructor(data: ByteArray) : Comparable<ByteString> {
    */
   fun toAsciiUppercase(): ByteString
 
-  /** Returns the byte at `pos`.  */
+  /** Returns the byte at `pos`. */
   internal fun internalGet(pos: Int): Byte
 
-  /** Returns the byte at `index`.  */
+  /** Returns the byte at `index`. */
   @JvmName("getByte")
   operator fun get(index: Int): Byte
 
   /** Returns the number of bytes in this ByteString. */
   val size: Int
-    @JvmName("size") get
+    @JvmName("size")
+    get
 
   // Hack to work around Kotlin's limitation for using JvmName on open/override vals/funs
   internal fun getSize(): Int
@@ -95,10 +97,10 @@ internal constructor(data: ByteArray) : Comparable<ByteString> {
   /** Returns a byte array containing a copy of the bytes in this `ByteString`. */
   fun toByteArray(): ByteArray
 
-  /** Writes the contents of this byte string to `buffer`.  */
+  /** Writes the contents of this byte string to `buffer`. */
   internal fun write(buffer: Buffer, offset: Int, byteCount: Int)
 
-  /** Returns the bytes of this string without a defensive copy. Do not mutate!  */
+  /** Returns the bytes of this string without a defensive copy. Do not mutate! */
   internal fun internalArray(): ByteArray
 
   /**
@@ -121,11 +123,9 @@ internal constructor(data: ByteArray) : Comparable<ByteString> {
 
   fun endsWith(suffix: ByteArray): Boolean
 
-  @JvmOverloads
-  fun indexOf(other: ByteString, fromIndex: Int = 0): Int
+  @JvmOverloads fun indexOf(other: ByteString, fromIndex: Int = 0): Int
 
-  @JvmOverloads
-  fun indexOf(other: ByteArray, fromIndex: Int = 0): Int
+  @JvmOverloads fun indexOf(other: ByteArray, fromIndex: Int = 0): Int
 
   fun lastIndexOf(other: ByteString, fromIndex: Int = size): Int
 
@@ -144,34 +144,28 @@ internal constructor(data: ByteArray) : Comparable<ByteString> {
   override fun toString(): String
 
   companion object {
-    /** A singleton empty `ByteString`.  */
-    @JvmField
-    val EMPTY: ByteString
+    /** A singleton empty `ByteString`. */
+    @JvmField val EMPTY: ByteString
 
     /** Returns a new byte string containing a clone of the bytes of `data`. */
-    @JvmStatic
-    fun of(vararg data: Byte): ByteString
+    @JvmStatic fun of(vararg data: Byte): ByteString
 
     /**
      * Returns a new [ByteString] containing a copy of `byteCount` bytes of this [ByteArray]
      * starting at `offset`.
      */
-    @JvmStatic
-    fun ByteArray.toByteString(offset: Int = 0, byteCount: Int = size): ByteString
+    @JvmStatic fun ByteArray.toByteString(offset: Int = 0, byteCount: Int = size): ByteString
 
-    /** Returns a new byte string containing the `UTF-8` bytes of this [String].  */
-    @JvmStatic
-    fun String.encodeUtf8(): ByteString
+    /** Returns a new byte string containing the `UTF-8` bytes of this [String]. */
+    @JvmStatic fun String.encodeUtf8(): ByteString
 
     /**
      * Decodes the Base64-encoded bytes and returns their value as a byte string. Returns null if
      * this is not a Base64-encoded sequence of bytes.
      */
-    @JvmStatic
-    fun String.decodeBase64(): ByteString?
+    @JvmStatic fun String.decodeBase64(): ByteString?
 
-      /** Decodes the hex-encoded bytes and returns their value a byte string.  */
-    @JvmStatic
-    fun String.decodeHex(): ByteString
+    /** Decodes the hex-encoded bytes and returns their value a byte string. */
+    @JvmStatic fun String.decodeHex(): ByteString
   }
 }

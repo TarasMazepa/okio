@@ -16,7 +16,6 @@
 
 @file:JvmName("-GzipSourceExtensions")
 @file:Suppress("NOTHING_TO_INLINE") // Aliases to public API.
-
 package okio
 
 import java.io.EOFException
@@ -25,8 +24,8 @@ import java.util.zip.CRC32
 import java.util.zip.Inflater
 
 /**
- * A source that uses [GZIP](http://www.ietf.org/rfc/rfc1952.txt) to
- * decompress data read from another source.
+ * A source that uses [GZIP](http://www.ietf.org/rfc/rfc1952.txt) to decompress data read from
+ * another source.
  */
 class GzipSource(source: Source) : Source {
 
@@ -34,9 +33,9 @@ class GzipSource(source: Source) : Source {
   private var section = SECTION_HEADER
 
   /**
-   * Our source should yield a GZIP header (which we consume directly), followed
-   * by deflated bytes (which we consume via an InflaterSource), followed by a
-   * GZIP trailer (which we also consume directly).
+   * Our source should yield a GZIP header (which we consume directly), followed by deflated bytes
+   * (which we consume via an InflaterSource), followed by a GZIP trailer (which we also consume
+   * directly).
    */
   private val source = RealBufferedSource(source)
 
@@ -44,8 +43,8 @@ class GzipSource(source: Source) : Source {
   private val inflater = Inflater(true)
 
   /**
-   * The inflater source takes care of moving data between compressed source and
-   * decompressed sink buffers.
+   * The inflater source takes care of moving data between compressed source and decompressed sink
+   * buffers.
    */
   private val inflaterSource = InflaterSource(this.source, inflater)
 
@@ -170,7 +169,7 @@ class GzipSource(source: Source) : Source {
   @Throws(IOException::class)
   override fun close() = inflaterSource.close()
 
-  /** Updates the CRC with the given bytes.  */
+  /** Updates the CRC with the given bytes. */
   private fun updateCrc(buffer: Buffer, offset: Long, byteCount: Long) {
     var offset = offset
     var byteCount = byteCount
@@ -198,7 +197,6 @@ class GzipSource(source: Source) : Source {
     }
   }
 }
-
 private inline fun Int.getBit(bit: Int) = this shr bit and 1 == 1
 
 private const val FHCRC = 1

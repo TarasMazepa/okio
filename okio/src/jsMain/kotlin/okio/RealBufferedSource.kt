@@ -46,9 +46,8 @@ import okio.internal.commonSkip
 import okio.internal.commonTimeout
 import okio.internal.commonToString
 
-internal actual class RealBufferedSource actual constructor(
-  actual val source: Source
-) : BufferedSource {
+internal actual class RealBufferedSource actual constructor(actual val source: Source) :
+    BufferedSource {
   actual var closed: Boolean = false
   override val buffer: Buffer = Buffer()
 
@@ -65,7 +64,7 @@ internal actual class RealBufferedSource actual constructor(
   override fun read(sink: ByteArray): Int = read(sink, 0, sink.size)
   override fun readFully(sink: ByteArray): Unit = commonReadFully(sink)
   override fun read(sink: ByteArray, offset: Int, byteCount: Int): Int =
-    commonRead(sink, offset, byteCount)
+      commonRead(sink, offset, byteCount)
 
   override fun readFully(sink: Buffer, byteCount: Long): Unit = commonReadFully(sink, byteCount)
   override fun readAll(sink: Sink): Long = commonReadAll(sink)
@@ -87,25 +86,19 @@ internal actual class RealBufferedSource actual constructor(
   override fun indexOf(b: Byte): Long = indexOf(b, 0L, Long.MAX_VALUE)
   override fun indexOf(b: Byte, fromIndex: Long): Long = indexOf(b, fromIndex, Long.MAX_VALUE)
   override fun indexOf(b: Byte, fromIndex: Long, toIndex: Long): Long =
-    commonIndexOf(b, fromIndex, toIndex)
+      commonIndexOf(b, fromIndex, toIndex)
 
   override fun indexOf(bytes: ByteString): Long = indexOf(bytes, 0L)
   override fun indexOf(bytes: ByteString, fromIndex: Long): Long = commonIndexOf(bytes, fromIndex)
   override fun indexOfElement(targetBytes: ByteString): Long = indexOfElement(targetBytes, 0L)
   override fun indexOfElement(targetBytes: ByteString, fromIndex: Long): Long =
-    commonIndexOfElement(targetBytes, fromIndex)
+      commonIndexOfElement(targetBytes, fromIndex)
 
-  override fun rangeEquals(offset: Long, bytes: ByteString) = rangeEquals(
-    offset, bytes, 0,
-    bytes.size
-  )
+  override fun rangeEquals(offset: Long, bytes: ByteString) =
+      rangeEquals(offset, bytes, 0, bytes.size)
 
-  override fun rangeEquals(
-    offset: Long,
-    bytes: ByteString,
-    bytesOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
+  override fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, bytes, bytesOffset, byteCount)
 
   override fun peek(): BufferedSource = commonPeek()
   override fun close(): Unit = commonClose()

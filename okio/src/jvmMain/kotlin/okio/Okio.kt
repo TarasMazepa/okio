@@ -16,7 +16,6 @@
 
 /** Essential APIs for working with Okio. */
 @file:JvmName("Okio")
-
 package okio
 
 import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
@@ -35,16 +34,11 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 actual fun Source.buffer(): BufferedSource = RealBufferedSource(this)
-
 actual fun Sink.buffer(): BufferedSink = RealBufferedSink(this)
 
 /** Returns a sink that writes to `out`. */
 fun OutputStream.sink(): Sink = OutputStreamSink(this, Timeout())
-
-private class OutputStreamSink(
-  private val out: OutputStream,
-  private val timeout: Timeout
-) : Sink {
+private class OutputStreamSink(private val out: OutputStream, private val timeout: Timeout) : Sink {
 
   override fun write(source: Buffer, byteCount: Long) {
     checkOffsetAndCount(source.size, 0, byteCount)
@@ -77,11 +71,8 @@ private class OutputStreamSink(
 
 /** Returns a source that reads from `in`. */
 fun InputStream.source(): Source = InputStreamSource(this, Timeout())
-
-private class InputStreamSource(
-  private val input: InputStream,
-  private val timeout: Timeout
-) : Source {
+private class InputStreamSource(private val input: InputStream, private val timeout: Timeout) :
+    Source {
 
   override fun read(sink: Buffer, byteCount: Long): Long {
     if (byteCount == 0L) return 0
@@ -114,14 +105,13 @@ private class InputStreamSource(
 
   override fun toString() = "source($input)"
 }
-
 @JvmName("blackhole")
 actual fun blackholeSink(): Sink = BlackholeSink()
 
 /**
- * Returns a sink that writes to `socket`. Prefer this over [sink]
- * because this method honors timeouts. When the socket
- * write times out, the socket is asynchronously closed by a watchdog thread.
+ * Returns a sink that writes to `socket`. Prefer this over [sink] because this method honors
+ * timeouts. When the socket write times out, the socket is asynchronously closed by a watchdog
+ * thread.
  */
 @Throws(IOException::class)
 fun Socket.sink(): Sink {
@@ -131,9 +121,9 @@ fun Socket.sink(): Sink {
 }
 
 /**
- * Returns a source that reads from `socket`. Prefer this over [source]
- * because this method honors timeouts. When the socket
- * read times out, the socket is asynchronously closed by a watchdog thread.
+ * Returns a source that reads from `socket`. Prefer this over [source] because this method honors
+ * timeouts. When the socket read times out, the socket is asynchronously closed by a watchdog
+ * thread.
  */
 @Throws(IOException::class)
 fun Socket.source(): Source {
@@ -141,7 +131,6 @@ fun Socket.source(): Source {
   val source = InputStreamSource(getInputStream(), timeout)
   return timeout.source(source)
 }
-
 private class SocketAsyncTimeout(private val socket: Socket) : AsyncTimeout() {
   private val logger = Logger.getLogger("okio.Okio")
 
@@ -186,19 +175,18 @@ fun File.source(): Source = inputStream().source()
 /** Returns a source that reads from `path`. */
 @Throws(IOException::class)
 @IgnoreJRERequirement // Can only be invoked on Java 7+.
-fun Path.sink(vararg options: OpenOption): Sink =
-    Files.newOutputStream(this, *options).sink()
+fun Path.sink(vararg options: OpenOption): Sink = Files.newOutputStream(this, *options).sink()
 
 /** Returns a sink that writes to `path`. */
 @Throws(IOException::class)
 @IgnoreJRERequirement // Can only be invoked on Java 7+.
-fun Path.source(vararg options: OpenOption): Source =
-    Files.newInputStream(this, *options).source()
+fun Path.source(vararg options: OpenOption): Source = Files.newInputStream(this, *options).source()
 
 /**
  * Returns true if this error is due to a firmware bug fixed after Android 4.2.2.
  * https://code.google.com/p/android/issues/detail?id=54072
  */
-internal val AssertionError.isAndroidGetsocknameError: Boolean get() {
-  return cause != null && message?.contains("getsockname failed") ?: false
-}
+internal val AssertionError.isAndroidGetsocknameError: Boolean
+  get() {
+    return cause != null && message?.contains("getsockname failed") ?: false
+  }

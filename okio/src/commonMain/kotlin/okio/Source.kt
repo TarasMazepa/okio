@@ -27,7 +27,7 @@ package okio
  * application is to read.
  *
  * ### Comparison with InputStream
-
+ *
  * This interface is functionally equivalent to [java.io.InputStream].
  *
  * `InputStream` requires multiple layers when consumed data is heterogeneous: a `DataInputStream`
@@ -57,7 +57,7 @@ expect interface Source {
    */
   fun read(sink: Buffer, byteCount: Long): Long
 
-  /** Returns the timeout for this source.  */
+  /** Returns the timeout for this source. */
   fun timeout(): Timeout
 
   /**

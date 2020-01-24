@@ -16,9 +16,7 @@
 
 package okio
 
-internal expect class RealBufferedSource(
-  source: Source
-) : BufferedSource {
+internal expect class RealBufferedSource(source: Source) : BufferedSource {
   val source: Source
   var closed: Boolean
 }

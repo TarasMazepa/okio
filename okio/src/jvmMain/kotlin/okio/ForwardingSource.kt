@@ -19,10 +19,9 @@ import java.io.IOException
 
 /** A [Source] which forwards calls to another. Useful for subclassing. */
 abstract class ForwardingSource(
-  /** [Source] to which this instance is delegating. */
-  @get:JvmName("delegate")
-  val delegate: Source
-) : Source {
+    /** [Source] to which this instance is delegating. */
+    @get:JvmName("delegate")
+    val delegate: Source) : Source {
   // TODO 'Source by delegate' once https://youtrack.jetbrains.com/issue/KT-23935 is fixed.
 
   @Throws(IOException::class)

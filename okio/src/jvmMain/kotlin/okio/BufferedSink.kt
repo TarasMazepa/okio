@@ -23,9 +23,9 @@ import java.nio.charset.Charset
 actual interface BufferedSink : Sink, WritableByteChannel {
   /** Returns this sink's internal buffer. */
   @Deprecated(
-    message = "moved to val: use getBuffer() instead",
-    replaceWith = ReplaceWith(expression = "buffer"),
-    level = DeprecationLevel.WARNING)
+      message = "moved to val: use getBuffer() instead",
+      replaceWith = ReplaceWith(expression = "buffer"),
+      level = DeprecationLevel.WARNING)
   fun buffer(): Buffer
 
   actual val buffer: Buffer

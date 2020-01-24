@@ -23,9 +23,9 @@ import java.nio.charset.Charset
 actual interface BufferedSource : Source, ReadableByteChannel {
   /** Returns this source's internal buffer. */
   @Deprecated(
-    message = "moved to val: use getBuffer() instead",
-    replaceWith = ReplaceWith(expression = "buffer"),
-    level = DeprecationLevel.WARNING)
+      message = "moved to val: use getBuffer() instead",
+      replaceWith = ReplaceWith(expression = "buffer"),
+      level = DeprecationLevel.WARNING)
   fun buffer(): Buffer
 
   actual val buffer: Buffer
@@ -121,10 +121,7 @@ actual interface BufferedSource : Source, ReadableByteChannel {
   @Throws(IOException::class)
   fun readString(charset: Charset): String
 
-  /**
-   * Removes `byteCount` bytes from this, decodes them as `charset`, and returns the
-   * string.
-   */
+  /** Removes `byteCount` bytes from this, decodes them as `charset`, and returns the string. */
   @Throws(IOException::class)
   fun readString(byteCount: Long, charset: Charset): String
 
@@ -153,7 +150,8 @@ actual interface BufferedSource : Source, ReadableByteChannel {
   actual fun rangeEquals(offset: Long, bytes: ByteString): Boolean
 
   @Throws(IOException::class)
-  actual fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int): Boolean
+  actual fun rangeEquals(offset: Long, bytes: ByteString, bytesOffset: Int, byteCount: Int):
+      Boolean
 
   actual fun peek(): BufferedSource
 

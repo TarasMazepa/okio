@@ -18,7 +18,7 @@ package okio
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/** A scriptable sink. Like Mockito, but worse and requiring less configuration.  */
+/** A scriptable sink. Like Mockito, but worse and requiring less configuration. */
 internal class MockSink : Sink {
   private val log = mutableListOf<String>()
   private val callThrows = LinkedHashMap<Int, IOException>()

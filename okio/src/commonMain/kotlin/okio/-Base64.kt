@@ -22,7 +22,6 @@ import okio.ByteString.Companion.encodeUtf8
 import kotlin.jvm.JvmName
 
 /** @author Alexander Y. Kleymenov */
-
 internal val BASE64 =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".encodeUtf8().data
 internal val BASE64_URL_SAFE =
@@ -111,7 +110,6 @@ internal fun String.decodeBase64ToArray(): ByteArray? {
   // Copy the decoded bytes to a new, right-sized array.
   return out.copyOf(outCount)
 }
-
 internal fun ByteArray.encodeBase64(map: ByteArray = BASE64): String {
   val length = (size + 2) / 3 * 4
   val out = ByteArray(length)

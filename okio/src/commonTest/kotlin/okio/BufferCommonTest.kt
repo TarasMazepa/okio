@@ -21,7 +21,8 @@ import kotlin.test.assertEquals
 
 class BufferCommonTest {
 
-  @Test fun copyToBuffer() {
+  @Test
+  fun copyToBuffer() {
     val source = Buffer()
     source.write("party".encodeUtf8())
 
@@ -31,7 +32,8 @@ class BufferCommonTest {
     assertEquals("party", source.readByteString().utf8())
   }
 
-  @Test fun copyToBufferWithOffset() {
+  @Test
+  fun copyToBufferWithOffset() {
     val source = Buffer()
     source.write("party".encodeUtf8())
 
@@ -41,7 +43,8 @@ class BufferCommonTest {
     assertEquals("party", source.readByteString().utf8())
   }
 
-  @Test fun copyToBufferWithByteCount() {
+  @Test
+  fun copyToBufferWithByteCount() {
     val source = Buffer()
     source.write("party".encodeUtf8())
 
@@ -51,7 +54,8 @@ class BufferCommonTest {
     assertEquals("party", source.readByteString().utf8())
   }
 
-  @Test fun copyToBufferWithOffsetAndByteCount() {
+  @Test
+  fun copyToBufferWithOffsetAndByteCount() {
     val source = Buffer()
     source.write("party".encodeUtf8())
 
@@ -61,18 +65,21 @@ class BufferCommonTest {
     assertEquals("party", source.readByteString().utf8())
   }
 
-  @Test fun completeSegmentByteCountOnEmptyBuffer() {
+  @Test
+  fun completeSegmentByteCountOnEmptyBuffer() {
     val buffer = Buffer()
     assertEquals(0, buffer.completeSegmentByteCount())
   }
 
-  @Test fun completeSegmentByteCountOnBufferWithFullSegments() {
+  @Test
+  fun completeSegmentByteCountOnBufferWithFullSegments() {
     val buffer = Buffer()
     buffer.writeUtf8("a".repeat(Segment.SIZE * 4))
     assertEquals((Segment.SIZE * 4).toLong(), buffer.completeSegmentByteCount())
   }
 
-  @Test fun completeSegmentByteCountOnBufferWithIncompleteTailSegment() {
+  @Test
+  fun completeSegmentByteCountOnBufferWithIncompleteTailSegment() {
     val buffer = Buffer()
     buffer.writeUtf8("a".repeat(Segment.SIZE * 4 - 10))
     assertEquals((Segment.SIZE * 3).toLong(), buffer.completeSegmentByteCount())

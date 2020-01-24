@@ -16,29 +16,26 @@
 
 @file:JvmName("-GzipSinkExtensions")
 @file:Suppress("NOTHING_TO_INLINE") // Aliases to public API.
-
 package okio
 
 import java.io.IOException
 import java.util.zip.CRC32
 import java.util.zip.Deflater
-
 import java.util.zip.Deflater.DEFAULT_COMPRESSION
 
 /**
- * A sink that uses [GZIP](http://www.ietf.org/rfc/rfc1952.txt) to
- * compress written data to another sink.
+ * A sink that uses [GZIP](http://www.ietf.org/rfc/rfc1952.txt) to compress written data to another
+ * sink.
  *
  * ### Sync flush
  *
- * Aggressive flushing of this stream may result in reduced compression. Each
- * call to [flush] immediately compresses all currently-buffered data;
- * this early compression may be less effective than compression performed
- * without flushing.
+ * Aggressive flushing of this stream may result in reduced compression. Each call to [flush]
+ * immediately compresses all currently-buffered data; this early compression may be less effective
+ * than compression performed without flushing.
  *
- * This is equivalent to using [Deflater] with the sync flush option.
- * This class does not offer any partial flush mechanism. For best performance,
- * only call [flush] when application behavior requires it.
+ * This is equivalent to using [Deflater] with the sync flush option. This class does not offer any
+ * partial flush mechanism. For best performance, only call [flush] when application behavior
+ * requires it.
  */
 class GzipSink(sink: Sink) : Sink {
   /** Sink into which the GZIP format is written. */
@@ -49,8 +46,8 @@ class GzipSink(sink: Sink) : Sink {
   val deflater = Deflater(DEFAULT_COMPRESSION, true /* No wrap */)
 
   /**
-   * The deflater sink takes care of moving data between decompressed source and
-   * compressed sink buffers.
+   * The deflater sink takes care of moving data between decompressed source and compressed sink
+   * buffers.
    */
   private val deflaterSink = DeflaterSink(this.sink, deflater)
 
@@ -61,14 +58,16 @@ class GzipSink(sink: Sink) : Sink {
 
   init {
     // Write the Gzip header directly into the buffer for the sink to avoid handling IOException.
-    this.sink.buffer.apply {
-      writeShort(0x1f8b) // Two-byte Gzip ID.
-      writeByte(0x08) // 8 == Deflate compression method.
-      writeByte(0x00) // No flags.
-      writeInt(0x00) // No modification time.
-      writeByte(0x00) // No extra flags.
-      writeByte(0x00) // No OS.
-    }
+    this.sink
+        .buffer
+        .apply {
+          writeShort(0x1f8b) // Two-byte Gzip ID.
+          writeByte(0x08) // 8 == Deflate compression method.
+          writeByte(0x00) // No flags.
+          writeInt(0x00) // No modification time.
+          writeByte(0x00) // No extra flags.
+          writeByte(0x00) // No OS.
+        }
   }
 
   @Throws(IOException::class)

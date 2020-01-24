@@ -16,7 +16,5 @@
 package okio
 
 actual fun Source.buffer(): BufferedSource = RealBufferedSource(this)
-
 actual fun Sink.buffer(): BufferedSink = RealBufferedSink(this)
-
 actual fun blackholeSink(): Sink = BlackholeSink()

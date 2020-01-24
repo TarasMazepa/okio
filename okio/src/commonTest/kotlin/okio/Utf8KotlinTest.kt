@@ -23,21 +23,24 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class Utf8KotlinTest {
-  @Test fun oneByteCharacters() {
+  @Test
+  fun oneByteCharacters() {
     assertEncoded("00", 0x00) // Smallest 1-byte character.
     assertEncoded("20", ' '.toInt())
     assertEncoded("7e", '~'.toInt())
     assertEncoded("7f", 0x7f) // Largest 1-byte character.
   }
 
-  @Test fun twoByteCharacters() {
+  @Test
+  fun twoByteCharacters() {
     assertEncoded("c280", 0x0080) // Smallest 2-byte character.
     assertEncoded("c3bf", 0x00ff)
     assertEncoded("c480", 0x0100)
     assertEncoded("dfbf", 0x07ff) // Largest 2-byte character.
   }
 
-  @Test fun threeByteCharacters() {
+  @Test
+  fun threeByteCharacters() {
     assertEncoded("e0a080", 0x0800) // Smallest 3-byte character.
     assertEncoded("e0bfbf", 0x0fff)
     assertEncoded("e18080", 0x1000)
@@ -50,12 +53,14 @@ class Utf8KotlinTest {
     assertEncoded("efbfbf", 0xffff) // Largest 3-byte character.
   }
 
-  @Test fun fourByteCharacters() {
+  @Test
+  fun fourByteCharacters() {
     assertEncoded("f0908080", 0x010000) // Smallest surrogate pair.
     assertEncoded("f48fbfbf", 0x10ffff) // Largest code point expressible by UTF-16.
   }
 
-  @Test fun unknownBytes() {
+  @Test
+  fun unknownBytes() {
     assertCodePointDecoded("f8", REPLACEMENT_CODE_POINT) // Too large
     assertCodePointDecoded("f0f8", REPLACEMENT_CODE_POINT, REPLACEMENT_CODE_POINT)
     assertCodePointDecoded("ff", REPLACEMENT_CODE_POINT) // Largest
@@ -66,7 +71,8 @@ class Utf8KotlinTest {
     assertCodePointDecoded("bf", REPLACEMENT_CODE_POINT) // Largest
   }
 
-  @Test fun overlongSequences() {
+  @Test
+  fun overlongSequences() {
     // Overlong representation of the NUL character
     assertCodePointDecoded("c080", REPLACEMENT_CODE_POINT)
     assertCodePointDecoded("e08080", REPLACEMENT_CODE_POINT)
@@ -78,17 +84,20 @@ class Utf8KotlinTest {
     assertCodePointDecoded("f08fbfbf", REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun danglingHighSurrogate() {
+  @Test
+  fun danglingHighSurrogate() {
     assertStringEncoded("3f", "\ud800") // "?"
     assertCodePointDecoded("eda080", REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun lowSurrogateWithoutHighSurrogate() {
+  @Test
+  fun lowSurrogateWithoutHighSurrogate() {
     assertStringEncoded("3f", "\udc00") // "?"
     assertCodePointDecoded("edb080", REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun highSurrogateFollowedByNonSurrogate() {
+  @Test
+  fun highSurrogateFollowedByNonSurrogate() {
     assertStringEncoded("3fee8080", "\ud800\ue000") // "?\ue000": Following character is too high.
     assertCodePointDecoded("f090ee8080", REPLACEMENT_CODE_POINT, '\ue000'.toInt())
 
@@ -96,22 +105,26 @@ class Utf8KotlinTest {
     assertCodePointDecoded("f09061", REPLACEMENT_CODE_POINT, 'a'.toInt())
   }
 
-  @Test fun doubleLowSurrogate() {
+  @Test
+  fun doubleLowSurrogate() {
     assertStringEncoded("3f3f", "\udc00\udc00") // "??"
     assertCodePointDecoded("edb080edb080", REPLACEMENT_CODE_POINT, REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun doubleHighSurrogate() {
+  @Test
+  fun doubleHighSurrogate() {
     assertStringEncoded("3f3f", "\ud800\ud800") // "??"
     assertCodePointDecoded("eda080eda080", REPLACEMENT_CODE_POINT, REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun lowSurrogateHighSurrogate() {
+  @Test
+  fun lowSurrogateHighSurrogate() {
     assertStringEncoded("3f3f", "\udc00\ud800") // "??"
     assertCodePointDecoded("edb080eda080", REPLACEMENT_CODE_POINT, REPLACEMENT_CODE_POINT)
   }
 
-  @Test fun writeSurrogateCodePoint() {
+  @Test
+  fun writeSurrogateCodePoint() {
     assertStringEncoded("ed9fbf", "\ud7ff") // Below lowest surrogate is okay.
     assertCodePointDecoded("ed9fbf", '\ud7ff'.toInt())
 
@@ -125,13 +138,15 @@ class Utf8KotlinTest {
     assertCodePointDecoded("ee8080", '\ue000'.toInt())
   }
 
-  @Test fun size() {
+  @Test
+  fun size() {
     assertEquals(0, "".utf8Size())
     assertEquals(3, "abc".utf8Size())
     assertEquals(16, "təˈranəˌsôr".utf8Size())
   }
 
-  @Test fun sizeWithBounds() {
+  @Test
+  fun sizeWithBounds() {
     assertEquals(0, "".utf8Size(0, 0))
     assertEquals(0, "abc".utf8Size(0, 0))
     assertEquals(1, "abc".utf8Size(1, 2))
@@ -141,24 +156,22 @@ class Utf8KotlinTest {
     assertEquals(5, "təˈranəˌsôr".utf8Size(3, 7))
   }
 
-  @Test fun sizeBoundsCheck() {
+  @Test
+  fun sizeBoundsCheck() {
     try {
       "abc".utf8Size(-1, 2)
       fail()
-    } catch (expected: IllegalArgumentException) {
-    }
+    } catch (expected: IllegalArgumentException) {}
 
     try {
       "abc".utf8Size(2, 1)
       fail()
-    } catch (expected: IllegalArgumentException) {
-    }
+    } catch (expected: IllegalArgumentException) {}
 
     try {
       "abc".utf8Size(1, 4)
       fail()
-    } catch (expected: IllegalArgumentException) {
-    }
+    } catch (expected: IllegalArgumentException) {}
   }
 
   private fun assertEncoded(hex: String, vararg codePoints: Int) {

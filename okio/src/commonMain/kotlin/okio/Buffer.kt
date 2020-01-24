@@ -40,21 +40,14 @@ expect class Buffer() : BufferedSource, BufferedSink {
 
   override fun emit(): Buffer
 
-  /** Copy `byteCount` bytes from this, starting at `offset`, to `out`.  */
-  fun copyTo(
-    out: Buffer,
-    offset: Long = 0L,
-    byteCount: Long
-  ): Buffer
+  /** Copy `byteCount` bytes from this, starting at `offset`, to `out`. */
+  fun copyTo(out: Buffer, offset: Long = 0L, byteCount: Long): Buffer
 
   /**
    * Overload of [copyTo] with byteCount = size - offset, work around for
-   *  https://youtrack.jetbrains.com/issue/KT-30847
+   * https://youtrack.jetbrains.com/issue/KT-30847
    */
-  fun copyTo(
-    out: Buffer,
-    offset: Long = 0L
-  ): Buffer
+  fun copyTo(out: Buffer, offset: Long = 0L): Buffer
 
   /**
    * Returns the number of bytes in segments that are not writable. This is the number of bytes that
@@ -71,7 +64,7 @@ expect class Buffer() : BufferedSource, BufferedSink {
    */
   fun clear()
 
-  /** Discards `byteCount` bytes from the head of this buffer.  */
+  /** Discards `byteCount` bytes from the head of this buffer. */
   override fun skip(byteCount: Long)
 
   override fun write(byteString: ByteString): Buffer
@@ -87,8 +80,8 @@ expect class Buffer() : BufferedSource, BufferedSink {
   override fun write(source: ByteArray): Buffer
 
   /**
-   * Returns a tail segment that we can write at least `minimumCapacity`
-   * bytes to, creating it if necessary.
+   * Returns a tail segment that we can write at least `minimumCapacity` bytes to, creating it if
+   * necessary.
    */
   internal fun writableSegment(minimumCapacity: Int): Segment
 
@@ -114,10 +107,10 @@ expect class Buffer() : BufferedSource, BufferedSink {
 
   override fun writeHexadecimalUnsignedLong(v: Long): Buffer
 
-  /** Returns a deep copy of this buffer.  */
+  /** Returns a deep copy of this buffer. */
   fun copy(): Buffer
 
-  /** Returns an immutable copy of this buffer as a byte string.  */
+  /** Returns an immutable copy of this buffer as a byte string. */
   fun snapshot(): ByteString
 
   /** Returns an immutable copy of the first `byteCount` bytes of this buffer as a byte string. */

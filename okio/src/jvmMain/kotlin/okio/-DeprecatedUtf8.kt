@@ -20,17 +20,15 @@ package okio
 object `-DeprecatedUtf8` {
   @Deprecated(
       message = "moved to extension function",
-      replaceWith = ReplaceWith(
-          expression = "string.utf8Size()",
-          imports = ["okio.utf8Size"]),
+      replaceWith = ReplaceWith(expression = "string.utf8Size()", imports = ["okio.utf8Size"]),
       level = DeprecationLevel.ERROR)
   fun size(string: String) = string.utf8Size()
 
   @Deprecated(
       message = "moved to extension function",
-      replaceWith = ReplaceWith(
-          expression = "string.utf8Size(beginIndex, endIndex)",
-          imports = ["okio.utf8Size"]),
+      replaceWith =
+          ReplaceWith(
+          expression = "string.utf8Size(beginIndex, endIndex)", imports = ["okio.utf8Size"]),
       level = DeprecationLevel.ERROR)
   fun size(string: String, beginIndex: Int, endIndex: Int) = string.utf8Size(beginIndex, endIndex)
 }

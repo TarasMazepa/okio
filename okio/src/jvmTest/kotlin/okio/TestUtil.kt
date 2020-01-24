@@ -32,8 +32,7 @@ object TestUtil {
   const val REPLACEMENT_CODE_POINT: Int = okio.REPLACEMENT_CODE_POINT
   @JvmStatic fun segmentPoolByteCount() = SegmentPool.byteCount
 
-  @JvmStatic
-  fun segmentSizes(buffer: Buffer): List<Int> = okio.segmentSizes(buffer)
+  @JvmStatic fun segmentSizes(buffer: Buffer): List<Int> = okio.segmentSizes(buffer)
 
   @JvmStatic
   fun assertNoEmptySegments(buffer: Buffer) {
@@ -172,7 +171,7 @@ object TestUtil {
     }
   }
 
-  /** Serializes original to bytes, then deserializes those bytes and returns the result.  */
+  /** Serializes original to bytes, then deserializes those bytes and returns the result. */
   @Suppress("UNCHECKED_CAST")
   @Throws(Exception::class)
   @JvmStatic
@@ -186,8 +185,7 @@ object TestUtil {
   }
 
   /**
-   * Returns a new buffer containing the data in `data` and a segment
-   * layout determined by `dice`.
+   * Returns a new buffer containing the data in `data` and a segment layout determined by `dice`.
    */
   @Throws(IOException::class)
   @JvmStatic
@@ -216,9 +214,9 @@ object TestUtil {
   }
 
   /**
-   * Returns a new buffer containing the contents of `segments`, attempting to isolate each
-   * string to its own segment in the returned buffer. This clones buffers so that segments are
-   * shared, preventing compaction from occurring.
+   * Returns a new buffer containing the contents of `segments`, attempting to isolate each string
+   * to its own segment in the returned buffer. This clones buffers so that segments are shared,
+   * preventing compaction from occurring.
    */
   @Throws(Exception::class)
   @JvmStatic
@@ -247,7 +245,7 @@ object TestUtil {
     return buffer.snapshot()
   }
 
-  /** Returns a copy of `buffer` with no segments with `original`.  */
+  /** Returns a copy of `buffer` with no segments with `original`. */
   @JvmStatic
   fun deepCopy(original: Buffer): Buffer {
     val result = Buffer()
@@ -269,10 +267,8 @@ object TestUtil {
   @JvmStatic
   fun Int.reverseBytes(): Int {
     /* ktlint-disable no-multi-spaces indent */
-    return (this and -0x1000000 ushr 24) or
-           (this and 0x00ff0000 ushr  8) or
-           (this and 0x0000ff00  shl  8) or
-           (this and 0x000000ff  shl 24)
+    return (this and -0x1000000 ushr 24) or (this and 0x00ff0000 ushr 8) or
+        (this and 0x0000ff00 shl 8) or (this and 0x000000ff shl 24)
     /* ktlint-enable no-multi-spaces indent */
   }
 
@@ -280,8 +276,7 @@ object TestUtil {
   fun Short.reverseBytes(): Short {
     val i = toInt() and 0xffff
     /* ktlint-disable no-multi-spaces indent */
-    val reversed = (i and 0xff00 ushr 8) or
-                   (i and 0x00ff  shl 8)
+    val reversed = (i and 0xff00 ushr 8) or (i and 0x00ff shl 8)
     /* ktlint-enable no-multi-spaces indent */
     return reversed.toShort()
   }

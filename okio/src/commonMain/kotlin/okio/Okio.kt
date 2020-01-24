@@ -30,7 +30,6 @@ expect fun Sink.buffer(): BufferedSink
 
 /** Returns a sink that writes nowhere. */
 expect fun blackholeSink(): Sink // expect/actual required for Java interop
-
 internal class BlackholeSink : Sink {
   override fun write(source: Buffer, byteCount: Long) = source.skip(byteCount)
   override fun flush() {}

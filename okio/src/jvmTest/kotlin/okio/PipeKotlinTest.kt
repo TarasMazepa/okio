@@ -33,12 +33,14 @@ class PipeKotlinTest {
 
   private val executorService = Executors.newScheduledThreadPool(1)
 
-  @After @Throws(Exception::class)
+  @After
+  @Throws(Exception::class)
   fun tearDown() {
     executorService.shutdown()
   }
 
-  @Test fun pipe() {
+  @Test
+  fun pipe() {
     val pipe = Pipe(6)
     pipe.sink.write(Buffer().writeUtf8("abc"), 3L)
 
@@ -52,7 +54,8 @@ class PipeKotlinTest {
     pipe.source.close()
   }
 
-  @Test fun fold() {
+  @Test
+  fun fold() {
     val pipe = Pipe(128)
 
     val pipeSink = pipe.sink.buffer()
@@ -64,27 +67,27 @@ class PipeKotlinTest {
 
     val foldedSinkBuffer = Buffer()
     var foldedSinkClosed = false
-    val foldedSink = object : ForwardingSink(foldedSinkBuffer) {
-      override fun close() {
-        foldedSinkClosed = true
-        super.close()
-      }
-    }
+    val foldedSink =
+        object : ForwardingSink(foldedSinkBuffer) {
+          override fun close() {
+            foldedSinkClosed = true
+            super.close()
+          }
+        }
     pipe.fold(foldedSink)
 
     pipeSink.writeUtf8("world")
     pipeSink.emit()
     assertEquals("world", foldedSinkBuffer.readUtf8(5))
 
-    assertFailsWith<IllegalStateException> {
-      pipeSource.readUtf8()
-    }
+    assertFailsWith<IllegalStateException> { pipeSource.readUtf8() }
 
     pipeSink.close()
     assertTrue(foldedSinkClosed)
   }
 
-  @Test fun foldWritesPipeContentsToSink() {
+  @Test
+  fun foldWritesPipeContentsToSink() {
     val pipe = Pipe(128)
 
     val pipeSink = pipe.sink.buffer()
@@ -97,15 +100,19 @@ class PipeKotlinTest {
     assertEquals("hello", foldSink.readUtf8(5))
   }
 
-  @Test fun foldUnblocksBlockedWrite() {
+  @Test
+  fun foldUnblocksBlockedWrite() {
     val pipe = Pipe(4)
     val foldSink = Buffer()
 
     val latch = CountDownLatch(1)
-    executorService.schedule({
-      pipe.fold(foldSink)
-      latch.countDown()
-    }, 500, TimeUnit.MILLISECONDS)
+    executorService.schedule(
+        {
+          pipe.fold(foldSink)
+          latch.countDown()
+        },
+        500,
+        TimeUnit.MILLISECONDS)
 
     val sink = pipe.sink.buffer()
     sink.writeUtf8("abcdefgh") // Blocks writing 8 bytes to a 4 byte pipe.
@@ -115,15 +122,15 @@ class PipeKotlinTest {
     assertEquals("abcdefgh", foldSink.readUtf8())
   }
 
-  @Test fun accessSourceAfterFold() {
+  @Test
+  fun accessSourceAfterFold() {
     val pipe = Pipe(100L)
     pipe.fold(Buffer())
-    assertFailsWith<IllegalStateException> {
-      pipe.source.read(Buffer(), 1L)
-    }
+    assertFailsWith<IllegalStateException> { pipe.source.read(Buffer(), 1L) }
   }
 
-  @Test fun honorsPipeSinkTimeoutOnWritingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkTimeoutOnWritingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutWritingSink()
 
@@ -132,13 +139,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(biggerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingTimeoutOnWritingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingTimeoutOnWritingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutWritingSink()
 
@@ -147,13 +153,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(smallerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkTimeoutOnFlushingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkTimeoutOnFlushingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutFlushingSink()
 
@@ -162,13 +167,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.flush() }
     assertEquals(biggerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingTimeoutOnFlushingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingTimeoutOnFlushingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutFlushingSink()
 
@@ -177,13 +181,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.flush() }
     assertEquals(smallerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkTimeoutOnClosingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkTimeoutOnClosingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutClosingSink()
 
@@ -192,13 +195,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.close() }
     assertEquals(biggerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingTimeoutOnClosingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingTimeoutOnClosingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutClosingSink()
 
@@ -207,13 +209,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerTimeoutNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(smallerTimeoutNanos) { pipe.sink.close() }
     assertEquals(smallerTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkTimeoutOnWritingWhenUnderlyingSinkTimeoutIsZero() {
+  @Test
+  fun honorsPipeSinkTimeoutOnWritingWhenUnderlyingSinkTimeoutIsZero() {
     val pipeSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -223,13 +224,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(pipeSinkTimeoutNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(pipeSinkTimeoutNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(0L, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingSinkTimeoutOnWritingWhenPipeSinkTimeoutIsZero() {
+  @Test
+  fun honorsUnderlyingSinkTimeoutOnWritingWhenPipeSinkTimeoutIsZero() {
     val underlyingSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -239,13 +239,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(underlyingSinkTimeoutNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(underlyingSinkTimeoutNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(underlyingSinkTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkTimeoutOnFlushingWhenUnderlyingSinkTimeoutIsZero() {
+  @Test
+  fun honorsPipeSinkTimeoutOnFlushingWhenUnderlyingSinkTimeoutIsZero() {
     val pipeSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -255,13 +254,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(pipeSinkTimeoutNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(pipeSinkTimeoutNanos) { pipe.sink.flush() }
     assertEquals(0L, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingSinkTimeoutOnFlushingWhenPipeSinkTimeoutIsZero() {
+  @Test
+  fun honorsUnderlyingSinkTimeoutOnFlushingWhenPipeSinkTimeoutIsZero() {
     val underlyingSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -271,13 +269,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(underlyingSinkTimeoutNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(underlyingSinkTimeoutNanos) { pipe.sink.flush() }
     assertEquals(underlyingSinkTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkTimeoutOnClosingWhenUnderlyingSinkTimeoutIsZero() {
+  @Test
+  fun honorsPipeSinkTimeoutOnClosingWhenUnderlyingSinkTimeoutIsZero() {
     val pipeSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -287,13 +284,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(pipeSinkTimeoutNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(pipeSinkTimeoutNanos) { pipe.sink.close() }
     assertEquals(0L, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsUnderlyingSinkTimeoutOnClosingWhenPipeSinkTimeoutIsZero() {
+  @Test
+  fun honorsUnderlyingSinkTimeoutOnClosingWhenPipeSinkTimeoutIsZero() {
     val underlyingSinkTimeoutNanos = smallerTimeoutNanos
 
     val pipe = Pipe(4)
@@ -303,13 +299,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(underlyingSinkTimeoutNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(underlyingSinkTimeoutNanos) { pipe.sink.close() }
     assertEquals(underlyingSinkTimeoutNanos, underlying.timeout().timeoutNanos())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnWritingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkDeadlineOnWritingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutWritingSink()
 
@@ -319,13 +314,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnWritingWhenUnderlyingSinkHasNoDeadline() {
+  @Test
+  fun honorsPipeSinkDeadlineOnWritingWhenUnderlyingSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -336,13 +330,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(deadlineNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertFalse(underlying.timeout().hasDeadline())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnWritingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnWritingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutWritingSink()
 
@@ -352,13 +345,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnWritingWhenPipeSinkHasNoDeadline() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnWritingWhenPipeSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -370,13 +362,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.write(Buffer().writeUtf8("abc"), 3)
-    }
+    assertDuration(deadlineNanos) { pipe.sink.write(Buffer().writeUtf8("abc"), 3) }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnFlushingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkDeadlineOnFlushingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutFlushingSink()
 
@@ -386,13 +377,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.flush() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnFlushingWhenUnderlyingSinkHasNoDeadline() {
+  @Test
+  fun honorsPipeSinkDeadlineOnFlushingWhenUnderlyingSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -403,13 +393,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(deadlineNanos) { pipe.sink.flush() }
     assertFalse(underlying.timeout().hasDeadline())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnFlushingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnFlushingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutFlushingSink()
 
@@ -419,13 +408,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.flush() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnFlushingWhenPipeSinkHasNoDeadline() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnFlushingWhenPipeSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -437,13 +425,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.flush()
-    }
+    assertDuration(deadlineNanos) { pipe.sink.flush() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnClosingWhenItIsSmaller() {
+  @Test
+  fun honorsPipeSinkDeadlineOnClosingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutClosingSink()
 
@@ -453,13 +440,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.close() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsPipeSinkDeadlineOnClosingWhenUnderlyingSinkHasNoDeadline() {
+  @Test
+  fun honorsPipeSinkDeadlineOnClosingWhenUnderlyingSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -470,13 +456,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(deadlineNanos) { pipe.sink.close() }
     assertFalse(underlying.timeout().hasDeadline())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnClosingWhenItIsSmaller() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnClosingWhenItIsSmaller() {
     val pipe = Pipe(4)
     val underlying = TimeoutClosingSink()
 
@@ -486,13 +471,12 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(smallerDeadlineNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(smallerDeadlineNanos) { pipe.sink.close() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun honorsUnderlyingSinkDeadlineOnClosingWhenPipeSinkHasNoDeadline() {
+  @Test
+  fun honorsUnderlyingSinkDeadlineOnClosingWhenPipeSinkHasNoDeadline() {
     val deadlineNanos = smallerDeadlineNanos
 
     val pipe = Pipe(4)
@@ -504,63 +488,71 @@ class PipeKotlinTest {
 
     pipe.fold(underlying)
 
-    assertDuration(deadlineNanos) {
-      pipe.sink.close()
-    }
+    assertDuration(deadlineNanos) { pipe.sink.close() }
     assertEquals(underlyingOriginalDeadline, underlying.timeout().deadlineNanoTime())
   }
 
-  @Test fun foldingTwiceThrows() {
+  @Test
+  fun foldingTwiceThrows() {
     val pipe = Pipe(128)
     pipe.fold(Buffer())
-    assertFailsWith<IllegalStateException> {
-      pipe.fold(Buffer())
-    }
+    assertFailsWith<IllegalStateException> { pipe.fold(Buffer()) }
   }
 
-  @Test fun sinkWriteThrowsIOExceptionUnblockBlockedWriter() {
+  @Test
+  fun sinkWriteThrowsIOExceptionUnblockBlockedWriter() {
     val pipe = Pipe(4)
 
-    val foldFuture = executorService.schedule({
-      val foldFailure = assertFailsWith<IOException> {
-        pipe.fold(object : ForwardingSink(blackholeSink()) {
-          override fun write(source: Buffer, byteCount: Long) {
-            throw IOException("boom")
-          }
-        })
-      }
-      assertEquals("boom", foldFailure.message)
-    }, 500, TimeUnit.MILLISECONDS)
+    val foldFuture =
+        executorService.schedule(
+            {
+              val foldFailure =
+                  assertFailsWith<IOException> {
+                    pipe.fold(
+                        object : ForwardingSink(blackholeSink()) {
+                          override fun write(source: Buffer, byteCount: Long) {
+                            throw IOException("boom")
+                          }
+                        })
+                  }
+              assertEquals("boom", foldFailure.message)
+            },
+            500,
+            TimeUnit.MILLISECONDS)
 
-    val writeFailure = assertFailsWith<IOException> {
-      val pipeSink = pipe.sink.buffer()
-      pipeSink.writeUtf8("abcdefghij")
-      pipeSink.emit() // Block writing 10 bytes to a 4 byte pipe.
-    }
+    val writeFailure =
+        assertFailsWith<IOException> {
+          val pipeSink = pipe.sink.buffer()
+          pipeSink.writeUtf8("abcdefghij")
+          pipeSink.emit() // Block writing 10 bytes to a 4 byte pipe.
+        }
     assertEquals("source is closed", writeFailure.message)
 
     foldFuture.get() // Confirm no unexpected exceptions.
   }
 
-  @Test fun foldHoldsNoLocksWhenForwardingWrites() {
+  @Test
+  fun foldHoldsNoLocksWhenForwardingWrites() {
     val pipe = Pipe(4)
 
     val pipeSink = pipe.sink.buffer()
     pipeSink.writeUtf8("abcd")
     pipeSink.emit()
 
-    pipe.fold(object : ForwardingSink(blackholeSink()) {
-      override fun write(source: Buffer, byteCount: Long) {
-        assertFalse(Thread.holdsLock(pipe.buffer))
-      }
-    })
+    pipe.fold(
+        object : ForwardingSink(blackholeSink()) {
+          override fun write(source: Buffer, byteCount: Long) {
+            assertFalse(Thread.holdsLock(pipe.buffer))
+          }
+        })
   }
 
   /**
    * Flushing the pipe wasn't causing the sink to be flushed when it was later folded. This was
    * causing problems because the folded data was stalled.
    */
-  @Test fun foldFlushesWhenThereIsFoldedData() {
+  @Test
+  fun foldFlushesWhenThereIsFoldedData() {
     val pipe = Pipe(128)
     val pipeSink = pipe.sink.buffer()
     pipeSink.writeUtf8("hello")
@@ -575,7 +567,8 @@ class PipeKotlinTest {
     assertEquals("hello", ultimateSink.readUtf8())
   }
 
-  @Test fun foldDoesNotFlushWhenThereIsNoFoldedData() {
+  @Test
+  fun foldDoesNotFlushWhenThereIsNoFoldedData() {
     val pipe = Pipe(128)
 
     val ultimateSink = Buffer()
@@ -588,7 +581,8 @@ class PipeKotlinTest {
     assertEquals("", ultimateSink.readUtf8())
   }
 
-  @Test fun foldingClosesUnderlyingSinkWhenPipeSinkIsClose() {
+  @Test
+  fun foldingClosesUnderlyingSinkWhenPipeSinkIsClose() {
     val pipe = Pipe(128)
 
     val pipeSink = pipe.sink.buffer()
@@ -597,12 +591,13 @@ class PipeKotlinTest {
 
     val foldedSinkBuffer = Buffer()
     var foldedSinkClosed = false
-    val foldedSink = object : ForwardingSink(foldedSinkBuffer) {
-      override fun close() {
-        foldedSinkClosed = true
-        super.close()
-      }
-    }
+    val foldedSink =
+        object : ForwardingSink(foldedSinkBuffer) {
+          override fun close() {
+            foldedSinkClosed = true
+            super.close()
+          }
+        }
 
     pipe.fold(foldedSink)
     assertEquals("world", foldedSinkBuffer.readUtf8(5))
@@ -614,26 +609,24 @@ class PipeKotlinTest {
     block()
     val elapsed = TimeUnit.MILLISECONDS.toNanos(System.currentTimeMillis() - start)
 
-    assertEquals(expected.toDouble(), elapsed.toDouble(),
-      TimeUnit.MILLISECONDS.toNanos(200).toDouble())
+    assertEquals(
+        expected.toDouble(), elapsed.toDouble(), TimeUnit.MILLISECONDS.toNanos(200).toDouble())
   }
 
   /** Writes on this sink never complete. They can only time out. */
   class TimeoutWritingSink : Sink {
-    val timeout = object : AsyncTimeout() {
-      override fun timedOut() {
-        synchronized(this@TimeoutWritingSink) {
-          (this@TimeoutWritingSink as Object).notifyAll()
+    val timeout =
+        object : AsyncTimeout() {
+          override fun timedOut() {
+            synchronized(this@TimeoutWritingSink) { (this@TimeoutWritingSink as Object).notifyAll()
+            }
+          }
         }
-      }
-    }
 
     override fun write(source: Buffer, byteCount: Long) {
       timeout.enter()
       try {
-        synchronized(this) {
-          (this as Object).wait()
-        }
+        synchronized(this) { (this as Object).wait() }
       } finally {
         timeout.exit()
       }
@@ -649,22 +642,21 @@ class PipeKotlinTest {
 
   /** Flushes on this sink never complete. They can only time out. */
   class TimeoutFlushingSink : Sink {
-    val timeout = object : AsyncTimeout() {
-      override fun timedOut() {
-        synchronized(this@TimeoutFlushingSink) {
-          (this@TimeoutFlushingSink as Object).notifyAll()
+    val timeout =
+        object : AsyncTimeout() {
+          override fun timedOut() {
+            synchronized(this@TimeoutFlushingSink) {
+              (this@TimeoutFlushingSink as Object).notifyAll()
+            }
+          }
         }
-      }
-    }
 
     override fun write(source: Buffer, byteCount: Long) = source.skip(byteCount)
 
     override fun flush() {
       timeout.enter()
       try {
-        synchronized(this) {
-          (this as Object).wait()
-        }
+        synchronized(this) { (this as Object).wait() }
       } finally {
         timeout.exit()
       }
@@ -677,13 +669,13 @@ class PipeKotlinTest {
 
   /** Closes on this sink never complete. They can only time out. */
   class TimeoutClosingSink : Sink {
-    val timeout = object : AsyncTimeout() {
-      override fun timedOut() {
-        synchronized(this@TimeoutClosingSink) {
-          (this@TimeoutClosingSink as Object).notifyAll()
+    val timeout =
+        object : AsyncTimeout() {
+          override fun timedOut() {
+            synchronized(this@TimeoutClosingSink) { (this@TimeoutClosingSink as Object).notifyAll()
+            }
+          }
         }
-      }
-    }
 
     override fun write(source: Buffer, byteCount: Long) = source.skip(byteCount)
 
@@ -692,9 +684,7 @@ class PipeKotlinTest {
     override fun close() {
       timeout.enter()
       try {
-        synchronized(this) {
-          (this as Object).wait()
-        }
+        synchronized(this) { (this as Object).wait() }
       } finally {
         timeout.exit()
       }

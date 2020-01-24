@@ -24,7 +24,8 @@ class ThrottlerTakeTest {
   private var elapsedNanos = 0L
   private val throttler = Throttler(allocatedUntil = nowNanos)
 
-  @Test fun takeByByteCount() {
+  @Test
+  fun takeByByteCount() {
     throttler.bytesPerSecond(bytesPerSecond = 20, waitByteCount = 5, maxByteCount = 10)
 
     // We get the first 10 bytes immediately (that's maxByteCount).
@@ -52,7 +53,8 @@ class ThrottlerTakeTest {
     assertElapsed(250L)
   }
 
-  @Test fun takeFullyTimeElapsed() {
+  @Test
+  fun takeFullyTimeElapsed() {
     throttler.bytesPerSecond(bytesPerSecond = 20, waitByteCount = 5, maxByteCount = 10)
 
     // We write the first 10 bytes immediately (that's maxByteCount again).
@@ -78,7 +80,8 @@ class ThrottlerTakeTest {
     assertElapsed(250L)
   }
 
-  @Test fun takeFullyWhenSaturated() {
+  @Test
+  fun takeFullyWhenSaturated() {
     throttler.bytesPerSecond(400L, 5L, 10L)
 
     // Saturate the throttler.
@@ -90,7 +93,8 @@ class ThrottlerTakeTest {
     assertElapsed(250L)
   }
 
-  @Test fun takeFullyNoLimit() {
+  @Test
+  fun takeFullyNoLimit() {
     throttler.bytesPerSecond(0L, 5L, 10L)
     takeFully(100L)
     assertElapsed(0L)
@@ -100,7 +104,8 @@ class ThrottlerTakeTest {
    * We had a bug where integer division truncation would cause us to call wait() for 0 nanos. We
    * fixed it by minimizing integer division generally, and by handling that case specifically.
    */
-  @Test fun infiniteWait() {
+  @Test
+  fun infiniteWait() {
     throttler.bytesPerSecond(3, maxByteCount = 4, waitByteCount = 4)
     takeFully(7)
     assertElapsed(1000L)

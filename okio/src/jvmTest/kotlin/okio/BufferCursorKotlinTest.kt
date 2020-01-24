@@ -41,46 +41,53 @@ class BufferCursorKotlinTest {
 
   @Parameter lateinit var bufferFactory: BufferFactory
 
-  @Test fun acquireReadOnlyDoesNotCopySharedDataArray() {
+  @Test
+  fun acquireReadOnlyDoesNotCopySharedDataArray() {
     val buffer = deepCopy(bufferFactory.newBuffer())
     assumeTrue(buffer.size > 0L)
 
     val shared = buffer.clone()
     assertTrue(buffer.head!!.shared)
 
-    buffer.readUnsafe().use { cursor ->
-      cursor.seek(0)
-      assertSame(cursor.data, shared.head!!.data)
-    }
+    buffer.readUnsafe()
+        .use { cursor ->
+          cursor.seek(0)
+          assertSame(cursor.data, shared.head!!.data)
+        }
   }
 
-  @Test fun acquireReadWriteDoesNotCopyUnsharedDataArray() {
+  @Test
+  fun acquireReadWriteDoesNotCopyUnsharedDataArray() {
     val buffer = deepCopy(bufferFactory.newBuffer())
     assumeTrue(buffer.size > 0L)
     assertFalse(buffer.head!!.shared)
 
     val originalData = buffer.head!!.data
 
-    buffer.readAndWriteUnsafe().use { cursor ->
-      cursor.seek(0)
-      assertSame(cursor.data, originalData)
-    }
+    buffer.readAndWriteUnsafe()
+        .use { cursor ->
+          cursor.seek(0)
+          assertSame(cursor.data, originalData)
+        }
   }
 
-  @Test fun acquireReadWriteCopiesSharedDataArray() {
+  @Test
+  fun acquireReadWriteCopiesSharedDataArray() {
     val buffer = deepCopy(bufferFactory.newBuffer())
     assumeTrue(buffer.size > 0L)
 
     val shared = buffer.clone()
     assertTrue(buffer.head!!.shared)
 
-    buffer.readAndWriteUnsafe().use { cursor ->
-      cursor.seek(0)
-      assertNotSame(cursor.data, shared.head!!.data)
-    }
+    buffer.readAndWriteUnsafe()
+        .use { cursor ->
+          cursor.seek(0)
+          assertNotSame(cursor.data, shared.head!!.data)
+        }
   }
 
-  @Test fun writeSharedSegments() {
+  @Test
+  fun writeSharedSegments() {
     val buffer = bufferFactory.newBuffer()
 
     // Make a deep copy. This buffer's segments are not shared.
@@ -95,11 +102,12 @@ class BufferCursorKotlinTest {
     val expected = Buffer()
     expected.writeUtf8("x".repeat(buffer.size.toInt()))
 
-    buffer.readAndWriteUnsafe().use { cursor ->
-      while (cursor.next() != -1) {
-        cursor.data!!.fill('x'.toByte(), cursor.start, cursor.end)
-      }
-    }
+    buffer.readAndWriteUnsafe()
+        .use { cursor ->
+          while (cursor.next() != -1) {
+            cursor.data!!.fill('x'.toByte(), cursor.start, cursor.end)
+          }
+        }
 
     // The buffer was fully changed.
     assertEquals(expected, buffer)
@@ -108,8 +116,9 @@ class BufferCursorKotlinTest {
     assertEquals(deepCopy, shallowCopy)
   }
 
-  /** As an optimization it's okay to use the same cursor on multiple buffers.  */
-  @Test fun cursorReuse() {
+  /** As an optimization it's okay to use the same cursor on multiple buffers. */
+  @Test
+  fun cursorReuse() {
     val cursor = UnsafeCursor()
 
     val buffer1 = bufferFactory.newBuffer()

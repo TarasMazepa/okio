@@ -31,14 +31,16 @@ import java.nio.file.StandardOpenOption.APPEND
 class OkioKotlinTest {
   @get:Rule val temp = TemporaryFolder()
 
-  @Test fun outputStreamSink() {
+  @Test
+  fun outputStreamSink() {
     val baos = ByteArrayOutputStream()
     val sink = baos.sink()
     sink.write(Buffer().writeUtf8("a"), 1L)
     assertThat(baos.toByteArray()).isEqualTo(byteArrayOf(0x61))
   }
 
-  @Test fun inputStreamSource() {
+  @Test
+  fun inputStreamSource() {
     val bais = ByteArrayInputStream(byteArrayOf(0x61))
     val source = bais.source()
     val buffer = Buffer()
@@ -46,14 +48,16 @@ class OkioKotlinTest {
     assertThat(buffer.readUtf8()).isEqualTo("a")
   }
 
-  @Test fun fileSink() {
+  @Test
+  fun fileSink() {
     val file = temp.newFile()
     val sink = file.sink()
     sink.write(Buffer().writeUtf8("a"), 1L)
     assertThat(file.readText()).isEqualTo("a")
   }
 
-  @Test fun fileAppendingSink() {
+  @Test
+  fun fileAppendingSink() {
     val file = temp.newFile()
     file.writeText("a")
     val sink = file.sink(append = true)
@@ -62,7 +66,8 @@ class OkioKotlinTest {
     assertThat(file.readText()).isEqualTo("ab")
   }
 
-  @Test fun fileSource() {
+  @Test
+  fun fileSource() {
     val file = temp.newFile()
     file.writeText("a")
     val source = file.source()
@@ -71,14 +76,16 @@ class OkioKotlinTest {
     assertThat(buffer.readUtf8()).isEqualTo("a")
   }
 
-  @Test fun pathSink() {
+  @Test
+  fun pathSink() {
     val file = temp.newFile()
     val sink = file.toPath().sink()
     sink.write(Buffer().writeUtf8("a"), 1L)
     assertThat(file.readText()).isEqualTo("a")
   }
 
-  @Test fun pathSinkWithOptions() {
+  @Test
+  fun pathSinkWithOptions() {
     val file = temp.newFile()
     file.writeText("a")
     val sink = file.toPath().sink(APPEND)
@@ -86,7 +93,8 @@ class OkioKotlinTest {
     assertThat(file.readText()).isEqualTo("ab")
   }
 
-  @Test fun pathSource() {
+  @Test
+  fun pathSource() {
     val file = temp.newFile()
     file.writeText("a")
     val source = file.toPath().source()
@@ -96,28 +104,33 @@ class OkioKotlinTest {
   }
 
   @Ignore("Not sure how to test this")
-  @Test fun pathSourceWithOptions() {
+  @Test
+  fun pathSourceWithOptions() {
     val folder = temp.newFolder()
     val file = File(folder, "new.txt")
     file.toPath().source(StandardOpenOption.CREATE_NEW)
     // This still throws NoSuchFileException...
   }
 
-  @Test fun socketSink() {
+  @Test
+  fun socketSink() {
     val baos = ByteArrayOutputStream()
-    val socket = object : Socket() {
-      override fun getOutputStream() = baos
-    }
+    val socket =
+        object : Socket() {
+          override fun getOutputStream() = baos
+        }
     val sink = socket.sink()
     sink.write(Buffer().writeUtf8("a"), 1L)
     assertThat(baos.toByteArray()).isEqualTo(byteArrayOf(0x61))
   }
 
-  @Test fun socketSource() {
+  @Test
+  fun socketSource() {
     val bais = ByteArrayInputStream(byteArrayOf(0x61))
-    val socket = object : Socket() {
-      override fun getInputStream() = bais
-    }
+    val socket =
+        object : Socket() {
+          override fun getInputStream() = bais
+        }
     val source = socket.source()
     val buffer = Buffer()
     source.read(buffer, 1L)

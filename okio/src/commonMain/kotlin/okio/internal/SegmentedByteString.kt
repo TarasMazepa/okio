@@ -16,7 +16,6 @@
 
 // TODO move to SegmentedByteString class: https://youtrack.jetbrains.com/issue/KT-20427
 @file:Suppress("NOTHING_TO_INLINE")
-
 package okio.internal
 
 import okio.Buffer
@@ -45,7 +44,7 @@ internal fun IntArray.binarySearch(value: Int, fromIndex: Int, toIndex: Int): In
   return -left - 1
 }
 
-/** Returns the index of the segment that contains the byte at `pos`.  */
+/** Returns the index of the segment that contains the byte at `pos`. */
 internal fun SegmentedByteString.segment(pos: Int): Int {
   // Search for (pos + 1) instead of (pos) because the directory holds sizes, not indexes.
   val i = directory.binarySearch(pos + 1, 0, segments.size)
@@ -54,8 +53,7 @@ internal fun SegmentedByteString.segment(pos: Int): Int {
 
 /** Processes all segments, invoking `action` with the ByteArray and range of valid data. */
 internal inline fun SegmentedByteString.forEachSegment(
-  action: (data: ByteArray, offset: Int, byteCount: Int) -> Unit
-) {
+    action: (data: ByteArray, offset: Int, byteCount: Int) -> Unit) {
   val segmentCount = segments.size
   var s = 0
   var pos = 0
@@ -74,10 +72,9 @@ internal inline fun SegmentedByteString.forEachSegment(
  * and range of the valid data.
  */
 private inline fun SegmentedByteString.forEachSegment(
-  beginIndex: Int,
-  endIndex: Int,
-  action: (data: ByteArray, offset: Int, byteCount: Int) -> Unit
-) {
+    beginIndex: Int,
+    endIndex: Int,
+    action: (data: ByteArray, offset: Int, byteCount: Int) -> Unit) {
   var s = segment(beginIndex)
   var pos = beginIndex
   while (pos < endIndex) {
@@ -96,7 +93,8 @@ private inline fun SegmentedByteString.forEachSegment(
 // TODO Kotlin's expect classes can't have default implementations, so platform implementations
 // have to call these functions. Remove all this nonsense when expect class allow actual code.
 
-internal inline fun SegmentedByteString.commonSubstring(beginIndex: Int, endIndex: Int): ByteString {
+internal inline fun SegmentedByteString.commonSubstring(beginIndex: Int, endIndex: Int):
+    ByteString {
   require(beginIndex >= 0) { "beginIndex=$beginIndex < 0" }
   require(endIndex <= size) { "endIndex=$endIndex > length($size)" }
 
@@ -125,7 +123,6 @@ internal inline fun SegmentedByteString.commonSubstring(beginIndex: Int, endInde
 
   return SegmentedByteString(newSegments, newDirectory)
 }
-
 internal inline fun SegmentedByteString.commonInternalGet(pos: Int): Byte {
   checkOffsetAndCount(directory[segments.size - 1].toLong(), pos.toLong(), 1)
   val segment = segment(pos)
@@ -133,20 +130,17 @@ internal inline fun SegmentedByteString.commonInternalGet(pos: Int): Byte {
   val segmentPos = directory[segment + segments.size]
   return segments[segment][pos - segmentOffset + segmentPos]
 }
-
 internal inline fun SegmentedByteString.commonGetSize() = directory[segments.size - 1]
-
 internal inline fun SegmentedByteString.commonToByteArray(): ByteArray {
   val result = ByteArray(size)
   var resultPos = 0
   forEachSegment { data, offset, byteCount ->
-    data.copyInto(result, destinationOffset = resultPos, startIndex = offset,
-      endIndex = offset + byteCount)
+    data.copyInto(
+        result, destinationOffset = resultPos, startIndex = offset, endIndex = offset + byteCount)
     resultPos += byteCount
   }
   return result
 }
-
 internal inline fun SegmentedByteString.commonWrite(buffer: Buffer, offset: Int, byteCount: Int) {
   forEachSegment(offset, offset + byteCount) { data, offset, byteCount ->
     val segment = Segment(data, offset, offset + byteCount, true, false)
@@ -160,12 +154,8 @@ internal inline fun SegmentedByteString.commonWrite(buffer: Buffer, offset: Int,
   }
   buffer.size += size
 }
-
 internal inline fun SegmentedByteString.commonRangeEquals(
-  offset: Int,
-  other: ByteString,
-  otherOffset: Int,
-  byteCount: Int
+    offset: Int, other: ByteString, otherOffset: Int, byteCount: Int
 ): Boolean {
   if (offset < 0 || offset > size - byteCount) return false
   // Go segment-by-segment through this, passing arrays to other's rangeEquals().
@@ -176,15 +166,11 @@ internal inline fun SegmentedByteString.commonRangeEquals(
   }
   return true
 }
-
 internal inline fun SegmentedByteString.commonRangeEquals(
-  offset: Int,
-  other: ByteArray,
-  otherOffset: Int,
-  byteCount: Int
+    offset: Int, other: ByteArray, otherOffset: Int, byteCount: Int
 ): Boolean {
-  if (offset < 0 || offset > size - byteCount ||
-    otherOffset < 0 || otherOffset > other.size - byteCount) {
+  if (offset < 0 || offset > size - byteCount || otherOffset < 0 ||
+      otherOffset > other.size - byteCount) {
     return false
   }
   // Go segment-by-segment through this, comparing ranges of arrays.
@@ -195,7 +181,6 @@ internal inline fun SegmentedByteString.commonRangeEquals(
   }
   return true
 }
-
 internal inline fun SegmentedByteString.commonEquals(other: Any?): Boolean {
   return when {
     other === this -> true
@@ -203,7 +188,6 @@ internal inline fun SegmentedByteString.commonEquals(other: Any?): Boolean {
     else -> false
   }
 }
-
 internal inline fun SegmentedByteString.commonHashCode(): Int {
   var result = hashCode
   if (result != 0) return result

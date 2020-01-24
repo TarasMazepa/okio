@@ -17,14 +17,10 @@
 package okio
 
 internal expect fun ByteArray.toUtf8String(): String
-
 internal expect fun String.asUtf8ToByteArray(): ByteArray
 
 // TODO make internal https://youtrack.jetbrains.com/issue/KT-19664
 expect class ArrayIndexOutOfBoundsException(message: String?) : IndexOutOfBoundsException
-
 internal expect inline fun <R> synchronized(lock: Any, block: () -> R): R
-
 expect open class IOException(message: String? = null) : Exception
-
 expect open class EOFException(message: String? = null) : IOException

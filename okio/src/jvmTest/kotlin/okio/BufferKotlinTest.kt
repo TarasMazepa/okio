@@ -20,7 +20,8 @@ import org.junit.Test
 import kotlin.test.fail
 
 class BufferKotlinTest {
-  @Test fun get() {
+  @Test
+  fun get() {
     val actual = Buffer().writeUtf8("abc")
     assertThat(actual[0]).isEqualTo('a'.toByte())
     assertThat(actual[1]).isEqualTo('b'.toByte())
@@ -28,16 +29,15 @@ class BufferKotlinTest {
     try {
       actual[-1]
       fail()
-    } catch (expected: IndexOutOfBoundsException) {
-    }
+    } catch (expected: IndexOutOfBoundsException) {}
     try {
       actual[3]
       fail()
-    } catch (expected: IndexOutOfBoundsException) {
-    }
+    } catch (expected: IndexOutOfBoundsException) {}
   }
 
-  @Test fun copyToOutputStream() {
+  @Test
+  fun copyToOutputStream() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -47,7 +47,8 @@ class BufferKotlinTest {
     assertThat(source.readUtf8()).isEqualTo("party")
   }
 
-  @Test fun copyToOutputStreamWithOffset() {
+  @Test
+  fun copyToOutputStreamWithOffset() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -57,7 +58,8 @@ class BufferKotlinTest {
     assertThat(source.readUtf8()).isEqualTo("party")
   }
 
-  @Test fun copyToOutputStreamWithByteCount() {
+  @Test
+  fun copyToOutputStreamWithByteCount() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -67,7 +69,8 @@ class BufferKotlinTest {
     assertThat(source.readUtf8()).isEqualTo("party")
   }
 
-  @Test fun copyToOutputStreamWithOffsetAndByteCount() {
+  @Test
+  fun copyToOutputStreamWithOffsetAndByteCount() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -77,7 +80,8 @@ class BufferKotlinTest {
     assertThat(source.readUtf8()).isEqualTo("party")
   }
 
-  @Test fun writeToOutputStream() {
+  @Test
+  fun writeToOutputStream() {
     val source = Buffer()
     source.writeUtf8("party")
 
@@ -87,7 +91,8 @@ class BufferKotlinTest {
     assertThat(source.readUtf8()).isEqualTo("")
   }
 
-  @Test fun writeToOutputStreamWithByteCount() {
+  @Test
+  fun writeToOutputStreamWithByteCount() {
     val source = Buffer()
     source.writeUtf8("party")
 

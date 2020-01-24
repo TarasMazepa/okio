@@ -33,10 +33,10 @@ import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-internal actual class SegmentedByteString internal actual constructor(
-  @Transient internal actual val segments: Array<ByteArray>,
-  @Transient internal actual val directory: IntArray
-) : ByteString(EMPTY.data) {
+internal actual class SegmentedByteString
+    internal actual constructor(
+        @Transient internal actual val segments: Array<ByteArray>,
+        @Transient internal actual val directory: IntArray) : ByteString(EMPTY.data) {
 
   override fun string(charset: Charset) = toByteString().string(charset)
 
@@ -50,9 +50,7 @@ internal actual class SegmentedByteString internal actual constructor(
 
   override fun digest(algorithm: String): ByteString {
     val digest = MessageDigest.getInstance(algorithm)
-    forEachSegment { data, offset, byteCount ->
-      digest.update(data, offset, byteCount)
-    }
+    forEachSegment { data, offset, byteCount -> digest.update(data, offset, byteCount) }
     return ByteString(digest.digest())
   }
 
@@ -60,9 +58,7 @@ internal actual class SegmentedByteString internal actual constructor(
     try {
       val mac = Mac.getInstance(algorithm)
       mac.init(SecretKeySpec(key.toByteArray(), algorithm))
-      forEachSegment { data, offset, byteCount ->
-        mac.update(data, offset, byteCount)
-      }
+      forEachSegment { data, offset, byteCount -> mac.update(data, offset, byteCount) }
       return ByteString(mac.doFinal())
     } catch (e: InvalidKeyException) {
       throw IllegalArgumentException(e)
@@ -72,7 +68,7 @@ internal actual class SegmentedByteString internal actual constructor(
   override fun base64Url() = toByteString().base64Url()
 
   override fun substring(beginIndex: Int, endIndex: Int): ByteString =
-    commonSubstring(beginIndex, endIndex)
+      commonSubstring(beginIndex, endIndex)
 
   override fun internalGet(pos: Int): Byte = commonInternalGet(pos)
 
@@ -84,34 +80,24 @@ internal actual class SegmentedByteString internal actual constructor(
 
   @Throws(IOException::class)
   override fun write(out: OutputStream) {
-    forEachSegment { data, offset, byteCount ->
-      out.write(data, offset, byteCount)
-    }
+    forEachSegment { data, offset, byteCount -> out.write(data, offset, byteCount) }
   }
 
   override fun write(buffer: Buffer, offset: Int, byteCount: Int): Unit =
-    commonWrite(buffer, offset, byteCount)
+      commonWrite(buffer, offset, byteCount)
 
-  override fun rangeEquals(
-    offset: Int,
-    other: ByteString,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  override fun rangeEquals(offset: Int, other: ByteString, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
-  override fun rangeEquals(
-    offset: Int,
-    other: ByteArray,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  override fun rangeEquals(offset: Int, other: ByteArray, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
   override fun indexOf(other: ByteArray, fromIndex: Int) = toByteString().indexOf(other, fromIndex)
 
-  override fun lastIndexOf(other: ByteArray, fromIndex: Int) = toByteString().lastIndexOf(other,
-      fromIndex)
+  override fun lastIndexOf(other: ByteArray, fromIndex: Int) = toByteString()
+          .lastIndexOf(other, fromIndex)
 
-  /** Returns a copy as a non-segmented byte string.  */
+  /** Returns a copy as a non-segmented byte string. */
   private fun toByteString() = ByteString(toByteArray())
 
   override fun internalArray() = toByteArray()

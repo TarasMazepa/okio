@@ -21,16 +21,18 @@ internal interface BufferedSinkFactory {
   fun create(data: Buffer): BufferedSink
 
   companion object {
-    val BUFFER: BufferedSinkFactory = object : BufferedSinkFactory {
-      override fun create(data: Buffer): BufferedSink {
-        return data
-      }
-    }
+    val BUFFER: BufferedSinkFactory =
+        object : BufferedSinkFactory {
+          override fun create(data: Buffer): BufferedSink {
+            return data
+          }
+        }
 
-    val REAL_BUFFERED_SINK: BufferedSinkFactory = object : BufferedSinkFactory {
-      override fun create(data: Buffer): BufferedSink {
-        return (data as Sink).buffer()
-      }
-    }
+    val REAL_BUFFERED_SINK: BufferedSinkFactory =
+        object : BufferedSinkFactory {
+          override fun create(data: Buffer): BufferedSink {
+            return (data as Sink).buffer()
+          }
+        }
   }
 }

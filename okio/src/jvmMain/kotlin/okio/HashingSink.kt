@@ -26,16 +26,13 @@ import javax.crypto.spec.SecretKeySpec
  * instance with your preferred hash algorithm. Write all of the data to the sink and then call
  * [hash] to compute the final hash value.
  *
- * In this example we use `HashingSink` with a [BufferedSink] to make writing to the
- * sink easier.
- * ```
- * HashingSink hashingSink = HashingSink.sha256(s);
- * BufferedSink bufferedSink = Okio.buffer(hashingSink);
+ * In this example we use `HashingSink` with a [BufferedSink] to make writing to the sink easier.
+ * ``` HashingSink hashingSink = HashingSink.sha256(s); BufferedSink bufferedSink =
+ * Okio.buffer(hashingSink);
  *
  * ... // Write to bufferedSink and either flush or close it.
  *
- * ByteString hash = hashingSink.hash();
- * ```
+ * ByteString hash = hashingSink.hash(); ```
  */
 class HashingSink : ForwardingSink {
   private val messageDigest: MessageDigest?
@@ -48,9 +45,8 @@ class HashingSink : ForwardingSink {
 
   internal constructor(sink: Sink, key: ByteString, algorithm: String) : super(sink) {
     try {
-      this.mac = Mac.getInstance(algorithm).apply {
-        init(SecretKeySpec(key.toByteArray(), algorithm))
-      }
+      this.mac = Mac.getInstance(algorithm)
+              .apply { init(SecretKeySpec(key.toByteArray(), algorithm)) }
       this.messageDigest = null
     } catch (e: InvalidKeyException) {
       throw IllegalArgumentException(e)
@@ -82,8 +78,8 @@ class HashingSink : ForwardingSink {
   /**
    * Returns the hash of the bytes accepted thus far and resets the internal state of this sink.
    *
-   * **Warning:** This method is not idempotent. Each time this method is called its
-   * internal state is cleared. This starts a new hash with zero bytes accepted.
+   * **Warning:** This method is not idempotent. Each time this method is called its internal state
+   * is cleared. This starts a new hash with zero bytes accepted.
    */
   @get:JvmName("hash")
   val hash: ByteString

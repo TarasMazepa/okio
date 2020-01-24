@@ -22,13 +22,17 @@ import kotlin.test.fail
 
 class CommonOptionsTest {
   /** Confirm that options prefers the first-listed option, not the longest or shortest one. */
-  @Test fun optionOrderTakesPrecedence() {
+  @Test
+  fun optionOrderTakesPrecedence() {
     assertSelect("abcdefg", 0, "abc", "abcdef")
     assertSelect("abcdefg", 0, "abcdef", "abc")
   }
 
-  @Test fun simpleOptionsTrie() {
-    assertEquals(utf8Options("hotdog", "hoth", "hot").trieString(), """
+  @Test
+  fun simpleOptionsTrie() {
+    assertEquals(
+        utf8Options("hotdog", "hoth", "hot").trieString(),
+        """
         |hot
         |   -> 2
         |   d
@@ -37,37 +41,41 @@ class CommonOptionsTest {
         |""".trimMargin())
   }
 
-  @Test fun realisticOptionsTrie() {
+  @Test
+  fun realisticOptionsTrie() {
     // These are the fields of OkHttpClient in 3.10.
-    val options = utf8Options(
-        "dispatcher",
-        "proxy",
-        "protocols",
-        "connectionSpecs",
-        "interceptors",
-        "networkInterceptors",
-        "eventListenerFactory",
-        "proxySelector", // No index 7 in the trie because 'proxy' is a prefix!
-        "cookieJar",
-        "cache",
-        "internalCache",
-        "socketFactory",
-        "sslSocketFactory",
-        "certificateChainCleaner",
-        "hostnameVerifier",
-        "certificatePinner",
-        "proxyAuthenticator", // No index 16 in the trie because 'proxy' is a prefix!
-        "authenticator",
-        "connectionPool",
-        "dns",
-        "followSslRedirects",
-        "followRedirects",
-        "retryOnConnectionFailure",
-        "connectTimeout",
-        "readTimeout",
-        "writeTimeout",
-        "pingInterval")
-    assertEquals(options.trieString(), """
+    val options =
+        utf8Options(
+            "dispatcher",
+            "proxy",
+            "protocols",
+            "connectionSpecs",
+            "interceptors",
+            "networkInterceptors",
+            "eventListenerFactory",
+            "proxySelector", // No index 7 in the trie because 'proxy' is a prefix!
+            "cookieJar",
+            "cache",
+            "internalCache",
+            "socketFactory",
+            "sslSocketFactory",
+            "certificateChainCleaner",
+            "hostnameVerifier",
+            "certificatePinner",
+            "proxyAuthenticator", // No index 16 in the trie because 'proxy' is a prefix!
+            "authenticator",
+            "connectionPool",
+            "dns",
+            "followSslRedirects",
+            "followRedirects",
+            "retryOnConnectionFailure",
+            "connectTimeout",
+            "readTimeout",
+            "writeTimeout",
+            "pingInterval")
+    assertEquals(
+        options.trieString(),
+        """
         |a
         | uthenticator -> 17
         |c
@@ -174,27 +182,28 @@ class CommonOptionsTest {
     assertSelect("pingInterval", 26, options)
   }
 
-  @Test fun emptyOptions() {
+  @Test
+  fun emptyOptions() {
     val options = utf8Options()
     assertSelect("", -1, options)
     assertSelect("a", -1, options)
     assertSelect("abc", -1, options)
   }
 
-  @Test fun emptyStringInOptionsTrie() {
+  @Test
+  fun emptyStringInOptionsTrie() {
     try {
       utf8Options("")
       fail()
-    } catch (expected: IllegalArgumentException) {
-    }
+    } catch (expected: IllegalArgumentException) {}
     try {
       utf8Options("abc", "")
       fail()
-    } catch (expected: IllegalArgumentException) {
-    }
+    } catch (expected: IllegalArgumentException) {}
   }
 
-  @Test fun multipleIdenticalValues() {
+  @Test
+  fun multipleIdenticalValues() {
     try {
       utf8Options("abc", "abc")
       fail()
@@ -203,9 +212,12 @@ class CommonOptionsTest {
     }
   }
 
-  @Test fun prefixesAreStripped() {
+  @Test
+  fun prefixesAreStripped() {
     val options = utf8Options("abcA", "abc", "abcB")
-    assertEquals(options.trieString(), """
+    assertEquals(
+        options.trieString(),
+        """
         |abc
         |   -> 1
         |   A -> 0
@@ -217,23 +229,32 @@ class CommonOptionsTest {
     assertSelect("ab", -1, options)
   }
 
-  @Test fun multiplePrefixesAreStripped() {
-    assertEquals(utf8Options("a", "ab", "abc", "abcd", "abcde").trieString(), """
+  @Test
+  fun multiplePrefixesAreStripped() {
+    assertEquals(
+        utf8Options("a", "ab", "abc", "abcd", "abcde").trieString(),
+        """
         |a -> 0
         |""".trimMargin())
-    assertEquals(utf8Options("abc", "a", "ab", "abe", "abcd", "abcf").trieString(), """
+    assertEquals(
+        utf8Options("abc", "a", "ab", "abe", "abcd", "abcf").trieString(),
+        """
         |a
         | -> 1
         | bc -> 0
         |""".trimMargin())
-    assertEquals(utf8Options("abc", "ab", "a").trieString(), """
+    assertEquals(
+        utf8Options("abc", "ab", "a").trieString(),
+        """
         |a
         | -> 2
         | b
         |  -> 1
         |  c -> 0
         |""".trimMargin())
-    assertEquals(utf8Options("abcd", "abce", "abc", "abcf", "abcg").trieString(), """
+    assertEquals(
+        utf8Options("abcd", "abce", "abc", "abcf", "abcg").trieString(),
+        """
         |abc
         |   -> 2
         |   d -> 0
@@ -241,12 +262,14 @@ class CommonOptionsTest {
         |""".trimMargin())
   }
 
-  @Test fun scan() {
+  @Test
+  fun scan() {
     val options = utf8Options("abc")
     assertSelect("abcde", 0, options)
   }
 
-  @Test fun scanReturnsPrefix() {
+  @Test
+  fun scanReturnsPrefix() {
     val options = utf8Options("abcdefg", "ab")
     assertSelect("ab", 1, options)
     assertSelect("abcd", 1, options)
@@ -255,7 +278,8 @@ class CommonOptionsTest {
     assertSelect("abcdhi", 1, options)
   }
 
-  @Test fun select() {
+  @Test
+  fun select() {
     val options = utf8Options("a", "b", "c")
     assertSelect("a", 0, options)
     assertSelect("b", 1, options)
@@ -267,7 +291,8 @@ class CommonOptionsTest {
     assertSelect("dd", -1, options)
   }
 
-  @Test fun selectSelect() {
+  @Test
+  fun selectSelect() {
     val options = utf8Options("aa", "ab", "ba", "bb")
     assertSelect("a", -1, options)
     assertSelect("b", -1, options)
@@ -283,7 +308,8 @@ class CommonOptionsTest {
     assertSelect("cc", -1, options)
   }
 
-  @Test fun selectScan() {
+  @Test
+  fun selectScan() {
     val options = utf8Options("abcd", "defg")
     assertSelect("a", -1, options)
     assertSelect("d", -1, options)
@@ -303,7 +329,8 @@ class CommonOptionsTest {
     assertSelect("hijkl", -1, options)
   }
 
-  @Test fun scanSelect() {
+  @Test
+  fun scanSelect() {
     val options = utf8Options("abcd", "abce")
     assertSelect("a", -1, options)
     assertSelect("f", -1, options)
@@ -316,7 +343,8 @@ class CommonOptionsTest {
     assertSelect("abcef", 1, options)
   }
 
-  @Test fun scanSpansSegments() {
+  @Test
+  fun scanSpansSegments() {
     val options = utf8Options("abcd")
     assertSelect(bufferWithSegments("a", "bcd"), 0, options)
     assertSelect(bufferWithSegments("a", "bcde"), 0, options)
@@ -334,7 +362,8 @@ class CommonOptionsTest {
     assertSelect(bufferWithSegments("abce", "f"), -1, options)
   }
 
-  @Test fun selectSpansSegments() {
+  @Test
+  fun selectSpansSegments() {
     val options = utf8Options("aa", "ab", "ba", "bb")
     assertSelect(bufferWithSegments("a", "a"), 0, options)
     assertSelect(bufferWithSegments("a", "b"), 1, options)

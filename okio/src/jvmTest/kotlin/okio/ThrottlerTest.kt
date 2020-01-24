@@ -34,76 +34,90 @@ class ThrottlerTest {
   private val executorService = Executors.newFixedThreadPool(threads)
   private var stopwatch = Stopwatch()
 
-  @Before fun setup() {
+  @Before
+  fun setup() {
     throttler.bytesPerSecond(4 * size, 4096, 8192)
     throttlerSlow.bytesPerSecond(2 * size, 4096, 8192)
     stopwatch = Stopwatch()
   }
 
-  @After fun teardown() {
+  @After
+  fun teardown() {
     executorService.shutdown()
   }
 
-  @Test fun source() {
+  @Test
+  fun source() {
     throttler.source(source).buffer().readAll(blackholeSink())
     stopwatch.assertElapsed(0.25)
   }
 
-  @Test fun sink() {
+  @Test
+  fun sink() {
     source.buffer().readAll(throttler.sink(blackholeSink()))
     stopwatch.assertElapsed(0.25)
   }
 
-  @Test fun doubleSourceThrottle() {
+  @Test
+  fun doubleSourceThrottle() {
     throttler.source(throttler.source(source)).buffer().readAll(blackholeSink())
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun doubleSinkThrottle() {
+  @Test
+  fun doubleSinkThrottle() {
     source.buffer().readAll(throttler.sink(throttler.sink(blackholeSink())))
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun singleSourceMultiThrottleSlowerThenSlow() {
+  @Test
+  fun singleSourceMultiThrottleSlowerThenSlow() {
     source.buffer().readAll(throttler.sink(throttlerSlow.sink(blackholeSink())))
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun singleSourceMultiThrottleSlowThenSlower() {
+  @Test
+  fun singleSourceMultiThrottleSlowThenSlower() {
     source.buffer().readAll(throttlerSlow.sink(throttler.sink(blackholeSink())))
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun slowSourceSlowerSink() {
+  @Test
+  fun slowSourceSlowerSink() {
     throttler.source(source).buffer().readAll(throttlerSlow.sink(blackholeSink()))
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun slowSinkSlowerSource() {
+  @Test
+  fun slowSinkSlowerSource() {
     throttlerSlow.source(source).buffer().readAll(throttler.sink(blackholeSink()))
     stopwatch.assertElapsed(0.5)
   }
 
-  @Test fun parallel() {
-    val futures = List(threads) {
-      executorService.submit {
-        val source = randomSource(size)
-        source.buffer().readAll(throttler.sink(blackholeSink()))
-      }
-    }
+  @Test
+  fun parallel() {
+    val futures =
+        List(threads) {
+          executorService.submit {
+            val source = randomSource(size)
+            source.buffer().readAll(throttler.sink(blackholeSink()))
+          }
+        }
     for (future in futures) {
       future.get()
     }
     stopwatch.assertElapsed(1.0)
   }
 
-  @Test fun parallelFastThenSlower() {
-    val futures = List(threads) {
-      executorService.submit {
-        val source = randomSource(size)
-        source.buffer().readAll(throttler.sink(blackholeSink()))
-      }
-    }
+  @Test
+  fun parallelFastThenSlower() {
+    val futures =
+        List(threads) {
+          executorService.submit {
+            val source = randomSource(size)
+            source.buffer().readAll(throttler.sink(blackholeSink()))
+          }
+        }
     Thread.sleep(500)
     throttler.bytesPerSecond(2 * size)
     for (future in futures) {
@@ -112,13 +126,15 @@ class ThrottlerTest {
     stopwatch.assertElapsed(1.5)
   }
 
-  @Test fun parallelSlowThenFaster() {
-    val futures = List(threads) {
-      executorService.submit {
-        val source = randomSource(size)
-        source.buffer().readAll(throttlerSlow.sink(blackholeSink()))
-      }
-    }
+  @Test
+  fun parallelSlowThenFaster() {
+    val futures =
+        List(threads) {
+          executorService.submit {
+            val source = randomSource(size)
+            source.buffer().readAll(throttlerSlow.sink(blackholeSink()))
+          }
+        }
     Thread.sleep(1_000)
     throttlerSlow.bytesPerSecond(4 * size)
     for (future in futures) {
@@ -127,32 +143,36 @@ class ThrottlerTest {
     stopwatch.assertElapsed(1.5)
   }
 
-  @Test fun parallelIndividualThrottle() {
-    val futures = List(threads) {
-      executorService.submit {
-        val throttlerLocal = Throttler()
-        throttlerLocal.bytesPerSecond(4 * size, maxByteCount = 8192)
+  @Test
+  fun parallelIndividualThrottle() {
+    val futures =
+        List(threads) {
+          executorService.submit {
+            val throttlerLocal = Throttler()
+            throttlerLocal.bytesPerSecond(4 * size, maxByteCount = 8192)
 
-        val source = randomSource(size)
-        source.buffer().readAll(throttlerLocal.sink(blackholeSink()))
-      }
-    }
+            val source = randomSource(size)
+            source.buffer().readAll(throttlerLocal.sink(blackholeSink()))
+          }
+        }
     for (future in futures) {
       future.get()
     }
     stopwatch.assertElapsed(0.25)
   }
 
-  @Test fun parallelGroupAndIndividualThrottle() {
-    val futures = List(threads) {
-      executorService.submit {
-        val throttlerLocal = Throttler()
-        throttlerLocal.bytesPerSecond(4 * size, maxByteCount = 8192)
+  @Test
+  fun parallelGroupAndIndividualThrottle() {
+    val futures =
+        List(threads) {
+          executorService.submit {
+            val throttlerLocal = Throttler()
+            throttlerLocal.bytesPerSecond(4 * size, maxByteCount = 8192)
 
-        val source = randomSource(size)
-        source.buffer().readAll(throttler.sink(throttlerLocal.sink(blackholeSink())))
-      }
-    }
+            val source = randomSource(size)
+            source.buffer().readAll(throttler.sink(throttlerLocal.sink(blackholeSink())))
+          }
+        }
     for (future in futures) {
       future.get()
     }

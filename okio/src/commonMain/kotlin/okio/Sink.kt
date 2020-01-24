@@ -43,13 +43,13 @@ package okio
  * to adapt a sink to an `OutputStream`.
  */
 expect interface Sink {
-  /** Removes `byteCount` bytes from `source` and appends them to this.  */
+  /** Removes `byteCount` bytes from `source` and appends them to this. */
   fun write(source: Buffer, byteCount: Long)
 
-  /** Pushes all buffered bytes to their final destination.  */
+  /** Pushes all buffered bytes to their final destination. */
   fun flush()
 
-  /** Returns the timeout for this sink.  */
+  /** Returns the timeout for this sink. */
   fun timeout(): Timeout
 
   /**

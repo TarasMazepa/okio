@@ -20,15 +20,9 @@ import okio.internal.commonAsUtf8ToByteArray
 import okio.internal.commonToUtf8String
 
 internal actual fun ByteArray.toUtf8String(): String = commonToUtf8String()
-
 internal actual fun String.asUtf8ToByteArray(): ByteArray = commonAsUtf8ToByteArray()
-
-actual open class ArrayIndexOutOfBoundsException actual constructor(
-  message: String?
-) : IndexOutOfBoundsException(message)
-
+actual open class ArrayIndexOutOfBoundsException actual constructor(message: String?) :
+    IndexOutOfBoundsException(message)
 internal actual inline fun <R> synchronized(lock: Any, block: () -> R): R = block()
-
 actual open class IOException actual constructor(message: String?) : Exception(message)
-
 actual open class EOFException actual constructor(message: String?) : IOException(message)

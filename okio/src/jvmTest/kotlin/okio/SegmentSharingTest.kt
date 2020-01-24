@@ -23,21 +23,24 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.fail
 
-/** Tests behavior optimized by sharing segments between buffers and byte strings.  */
+/** Tests behavior optimized by sharing segments between buffers and byte strings. */
 class SegmentSharingTest {
-  @Test fun snapshotOfEmptyBuffer() {
+  @Test
+  fun snapshotOfEmptyBuffer() {
     val snapshot = Buffer().snapshot()
     assertEquivalent(snapshot, ByteString.EMPTY)
   }
 
-  @Test fun snapshotsAreEquivalent() {
+  @Test
+  fun snapshotsAreEquivalent() {
     val byteString = bufferWithSegments(xs, ys, zs).snapshot()
     assertEquivalent(byteString, bufferWithSegments(xs, ys + zs).snapshot())
     assertEquivalent(byteString, bufferWithSegments(xs + ys + zs).snapshot())
     assertEquivalent(byteString, (xs + ys + zs).encodeUtf8())
   }
 
-  @Test fun snapshotGetByte() {
+  @Test
+  fun snapshotGetByte() {
     val byteString = bufferWithSegments(xs, ys, zs).snapshot()
     assertEquals('x', byteString[0].toChar())
     assertEquals('x', byteString[xs.length - 1].toChar())
@@ -48,17 +51,16 @@ class SegmentSharingTest {
     try {
       byteString[-1]
       fail()
-    } catch (expected: IndexOutOfBoundsException) {
-    }
+    } catch (expected: IndexOutOfBoundsException) {}
 
     try {
       byteString[xs.length + ys.length + zs.length]
       fail()
-    } catch (expected: IndexOutOfBoundsException) {
-    }
+    } catch (expected: IndexOutOfBoundsException) {}
   }
 
-  @Test fun snapshotWriteToOutputStream() {
+  @Test
+  fun snapshotWriteToOutputStream() {
     val byteString = bufferWithSegments(xs, ys, zs).snapshot()
     val out = Buffer()
     byteString.write(out.outputStream())
@@ -69,7 +71,8 @@ class SegmentSharingTest {
    * Snapshots share their backing byte arrays with the source buffers. Those byte arrays must not
    * be recycled, otherwise the new writer could corrupt the segment.
    */
-  @Test fun snapshotSegmentsAreNotRecycled() {
+  @Test
+  fun snapshotSegmentsAreNotRecycled() {
     val buffer = bufferWithSegments(xs, ys, zs)
     val snapshot = buffer.snapshot()
     assertEquals(xs + ys + zs, snapshot.utf8())
@@ -84,10 +87,11 @@ class SegmentSharingTest {
   }
 
   /**
-   * Clones share their backing byte arrays with the source buffers. Those byte arrays must not
-   * be recycled, otherwise the new writer could corrupt the segment.
+   * Clones share their backing byte arrays with the source buffers. Those byte arrays must not be
+   * recycled, otherwise the new writer could corrupt the segment.
    */
-  @Test fun cloneSegmentsAreNotRecycled() {
+  @Test
+  fun cloneSegmentsAreNotRecycled() {
     val buffer = bufferWithSegments(xs, ys, zs)
     val clone = buffer.clone()
 
@@ -102,20 +106,23 @@ class SegmentSharingTest {
     }
   }
 
-  @Test fun snapshotJavaSerialization() {
+  @Test
+  fun snapshotJavaSerialization() {
     val byteString = bufferWithSegments(xs, ys, zs).snapshot()
     assertEquivalent(byteString, TestUtil.reserialize(byteString))
   }
 
-  @Test fun clonesAreEquivalent() {
+  @Test
+  fun clonesAreEquivalent() {
     val bufferA = bufferWithSegments(xs, ys, zs)
     val bufferB = bufferA.clone()
     assertEquivalent(bufferA, bufferB)
     assertEquivalent(bufferA, bufferWithSegments(xs + ys, zs))
   }
 
-  /** Even though some segments are shared, clones can be mutated independently.  */
-  @Test fun mutateAfterClone() {
+  /** Even though some segments are shared, clones can be mutated independently. */
+  @Test
+  fun mutateAfterClone() {
     val bufferA = Buffer()
     bufferA.writeUtf8("abc")
     val bufferB = bufferA.clone()
@@ -125,7 +132,8 @@ class SegmentSharingTest {
     assertEquals("abcDEF", bufferB.readUtf8())
   }
 
-  @Test fun concatenateSegmentsCanCombine() {
+  @Test
+  fun concatenateSegmentsCanCombine() {
     val bufferA = Buffer().writeUtf8(ys).writeUtf8(us)
     assertEquals(ys, bufferA.readUtf8(ys.length.toLong()))
     val bufferB = Buffer().writeUtf8(vs).writeUtf8(ws)
@@ -138,7 +146,8 @@ class SegmentSharingTest {
     assertEquals(us + xs, bufferC.readUtf8())
   }
 
-  @Test fun shareAndSplit() {
+  @Test
+  fun shareAndSplit() {
     val bufferA = Buffer().writeUtf8("xxxx")
     val snapshot = bufferA.snapshot() // Share the segment.
     val bufferB = Buffer()
@@ -147,7 +156,8 @@ class SegmentSharingTest {
     assertEquals("xxxx", snapshot.utf8())
   }
 
-  @Test fun appendSnapshotToEmptyBuffer() {
+  @Test
+  fun appendSnapshotToEmptyBuffer() {
     val bufferA = bufferWithSegments(xs, ys)
     val snapshot = bufferA.snapshot()
     val bufferB = Buffer()
@@ -155,7 +165,8 @@ class SegmentSharingTest {
     assertEquivalent(bufferB, bufferA)
   }
 
-  @Test fun appendSnapshotToNonEmptyBuffer() {
+  @Test
+  fun appendSnapshotToNonEmptyBuffer() {
     val bufferA = bufferWithSegments(xs, ys)
     val snapshot = bufferA.snapshot()
     val bufferB = Buffer().writeUtf8(us)
@@ -163,7 +174,8 @@ class SegmentSharingTest {
     assertEquivalent(bufferB, Buffer().writeUtf8(us + xs + ys))
   }
 
-  @Test fun copyToSegmentSharing() {
+  @Test
+  fun copyToSegmentSharing() {
     val bufferA = bufferWithSegments(ws, xs + "aaaa", ys, "bbbb$zs")
     val bufferB = bufferWithSegments(us)
     bufferA.copyTo(bufferB, (ws.length + xs.length).toLong(), (4 + ys.length + 4).toLong())

@@ -68,7 +68,7 @@ actual open class Timeout {
     return this
   }
 
-  /** Set a deadline of now plus `duration` time.  */
+  /** Set a deadline of now plus `duration` time. */
   fun deadline(duration: Long, unit: TimeUnit): Timeout {
     require(duration > 0) { "duration <= 0: $duration" }
     return deadlineNanoTime(System.nanoTime() + unit.toNanos(duration))
@@ -110,33 +110,17 @@ actual open class Timeout {
    *
    * Here's a sample class that uses `waitUntilNotified()` to await a specific state. Note that the
    * call is made within a loop to avoid unnecessary waiting and to mitigate spurious notifications.
-   * ```
-   * class Dice {
-   *   Random random = new Random();
-   *   int latestTotal;
+   * ``` class Dice { Random random = new Random(); int latestTotal;
    *
-   *   public synchronized void roll() {
-   *     latestTotal = 2 + random.nextInt(6) + random.nextInt(6);
-   *     System.out.println("Rolled " + latestTotal);
-   *     notifyAll();
-   *   }
+   * public synchronized void roll() { latestTotal = 2 + random.nextInt(6) + random.nextInt(6);
+   * System.out.println("Rolled " + latestTotal); notifyAll(); }
    *
-   *   public void rollAtFixedRate(int period, TimeUnit timeUnit) {
-   *     Executors.newScheduledThreadPool(0).scheduleAtFixedRate(new Runnable() {
-   *       public void run() {
-   *         roll();
-   *       }
-   *     }, 0, period, timeUnit);
-   *   }
+   * public void rollAtFixedRate(int period, TimeUnit timeUnit) {
+   * Executors.newScheduledThreadPool(0).scheduleAtFixedRate(new Runnable() { public void run() {
+   * roll(); } }, 0, period, timeUnit); }
    *
-   *   public synchronized void awaitTotal(Timeout timeout, int total)
-   *       throws InterruptedIOException {
-   *     while (latestTotal != total) {
-   *       timeout.waitUntilNotified(this);
-   *     }
-   *   }
-   * }
-   * ```
+   * public synchronized void awaitTotal(Timeout timeout, int total) throws InterruptedIOException {
+   * while (latestTotal != total) { timeout.waitUntilNotified(this); } } } ```
    */
   @Throws(InterruptedIOException::class)
   fun waitUntilNotified(monitor: Any) {
@@ -151,14 +135,15 @@ actual open class Timeout {
 
       // Compute how long we'll wait.
       val start = System.nanoTime()
-      val waitNanos = if (hasDeadline && timeoutNanos != 0L) {
-        val deadlineNanos = deadlineNanoTime() - start
-        minOf(timeoutNanos, deadlineNanos)
-      } else if (hasDeadline) {
-        deadlineNanoTime() - start
-      } else {
-        timeoutNanos
-      }
+      val waitNanos =
+          if (hasDeadline && timeoutNanos != 0L) {
+            val deadlineNanos = deadlineNanoTime() - start
+            minOf(timeoutNanos, deadlineNanos)
+          } else if (hasDeadline) {
+            deadlineNanoTime() - start
+          } else {
+            timeoutNanos
+          }
 
       // Attempt to wait that long. This will break out early if the monitor is notified.
       var elapsedNanos = 0L
@@ -215,19 +200,22 @@ actual open class Timeout {
   }
 
   actual companion object {
-    @JvmField actual val NONE: Timeout = object : Timeout() {
-      override fun timeout(timeout: Long, unit: TimeUnit): Timeout = this
+    @JvmField
+    actual val NONE: Timeout =
+        object : Timeout() {
+          override fun timeout(timeout: Long, unit: TimeUnit): Timeout = this
 
-      override fun deadlineNanoTime(deadlineNanoTime: Long): Timeout = this
+          override fun deadlineNanoTime(deadlineNanoTime: Long): Timeout = this
 
-      override fun throwIfReached() {}
-    }
+          override fun throwIfReached() {}
+        }
 
-    fun minTimeout(aNanos: Long, bNanos: Long) = when {
-      aNanos == 0L -> bNanos
-      bNanos == 0L -> aNanos
-      aNanos < bNanos -> aNanos
-      else -> bNanos
-    }
+    fun minTimeout(aNanos: Long, bNanos: Long) =
+        when {
+          aNanos == 0L -> bNanos
+          bNanos == 0L -> aNanos
+          aNanos < bNanos -> aNanos
+          else -> bNanos
+        }
   }
 }

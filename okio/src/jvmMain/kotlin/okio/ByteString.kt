@@ -55,42 +55,40 @@ import java.security.MessageDigest
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-actual open class ByteString
-internal actual constructor(
-  internal actual val data: ByteArray
-) : Serializable, Comparable<ByteString> {
+actual open class ByteString internal actual constructor(internal actual val data: ByteArray) :
+    Serializable, Comparable<ByteString> {
   @Transient internal actual var hashCode: Int = 0 // Lazily computed; 0 if unknown.
   @Transient internal actual var utf8: String? = null // Lazily computed.
 
   actual open fun utf8(): String = commonUtf8()
 
-  /** Constructs a new `String` by decoding the bytes using `charset`.  */
+  /** Constructs a new `String` by decoding the bytes using `charset`. */
   open fun string(charset: Charset) = String(data, charset)
 
   actual open fun base64() = commonBase64()
 
-  /** Returns the 128-bit MD5 hash of this byte string.  */
+  /** Returns the 128-bit MD5 hash of this byte string. */
   open fun md5() = digest("MD5")
 
-  /** Returns the 160-bit SHA-1 hash of this byte string.  */
+  /** Returns the 160-bit SHA-1 hash of this byte string. */
   open fun sha1() = digest("SHA-1")
 
-  /** Returns the 256-bit SHA-256 hash of this byte string.  */
+  /** Returns the 256-bit SHA-256 hash of this byte string. */
   open fun sha256() = digest("SHA-256")
 
-  /** Returns the 512-bit SHA-512 hash of this byte string.  */
+  /** Returns the 512-bit SHA-512 hash of this byte string. */
   open fun sha512() = digest("SHA-512")
 
   internal open fun digest(algorithm: String) =
       ByteString(MessageDigest.getInstance(algorithm).digest(data))
 
-  /** Returns the 160-bit SHA-1 HMAC of this byte string.  */
+  /** Returns the 160-bit SHA-1 HMAC of this byte string. */
   open fun hmacSha1(key: ByteString) = hmac("HmacSHA1", key)
 
-  /** Returns the 256-bit SHA-256 HMAC of this byte string.  */
+  /** Returns the 256-bit SHA-256 HMAC of this byte string. */
   open fun hmacSha256(key: ByteString) = hmac("HmacSHA256", key)
 
-  /** Returns the 512-bit SHA-512 HMAC of this byte string.  */
+  /** Returns the 512-bit SHA-512 HMAC of this byte string. */
   open fun hmacSha512(key: ByteString) = hmac("HmacSHA512", key)
 
   internal open fun hmac(algorithm: String, key: ByteString): ByteString {
@@ -121,7 +119,8 @@ internal actual constructor(
   actual operator fun get(index: Int): Byte = internalGet(index)
 
   actual val size
-    @JvmName("size") get() = getSize()
+    @JvmName("size")
+    get() = getSize()
 
   internal actual open fun getSize() = commonGetSize()
 
@@ -132,28 +131,20 @@ internal actual constructor(
   /** Returns a `ByteBuffer` view of the bytes in this `ByteString`. */
   open fun asByteBuffer(): ByteBuffer = ByteBuffer.wrap(data).asReadOnlyBuffer()
 
-  /** Writes the contents of this byte string to `out`.  */
+  /** Writes the contents of this byte string to `out`. */
   @Throws(IOException::class)
   open fun write(out: OutputStream) {
     out.write(data)
   }
 
   internal actual open fun write(buffer: Buffer, offset: Int, byteCount: Int) =
-    commonWrite(buffer, offset, byteCount)
+      commonWrite(buffer, offset, byteCount)
 
-  actual open fun rangeEquals(
-    offset: Int,
-    other: ByteString,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  actual open fun rangeEquals(offset: Int, other: ByteString, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
-  actual open fun rangeEquals(
-    offset: Int,
-    other: ByteArray,
-    otherOffset: Int,
-    byteCount: Int
-  ): Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
+  actual open fun rangeEquals(offset: Int, other: ByteArray, otherOffset: Int, byteCount: Int):
+      Boolean = commonRangeEquals(offset, other, otherOffset, byteCount)
 
   actual fun startsWith(prefix: ByteString) = commonStartsWith(prefix)
 
@@ -173,7 +164,8 @@ internal actual constructor(
   actual fun lastIndexOf(other: ByteString, fromIndex: Int) = commonLastIndexOf(other, fromIndex)
 
   @JvmOverloads
-  actual open fun lastIndexOf(other: ByteArray, fromIndex: Int) = commonLastIndexOf(other, fromIndex)
+  actual open fun lastIndexOf(other: ByteArray, fromIndex: Int) =
+      commonLastIndexOf(other, fromIndex)
 
   actual override fun equals(other: Any?) = commonEquals(other)
 
@@ -215,16 +207,14 @@ internal actual constructor(
   actual companion object {
     private const val serialVersionUID = 1L
 
-    @JvmField
-    actual val EMPTY: ByteString = ByteString(byteArrayOf())
+    @JvmField actual val EMPTY: ByteString = ByteString(byteArrayOf())
 
-    @JvmStatic
-    actual fun of(vararg data: Byte) = commonOf(data)
+    @JvmStatic actual fun of(vararg data: Byte) = commonOf(data)
 
     @JvmStatic
     @JvmName("of")
     actual fun ByteArray.toByteString(offset: Int, byteCount: Int): ByteString =
-      commonToByteString(offset, byteCount)
+        commonToByteString(offset, byteCount)
 
     /** Returns a [ByteString] containing a copy of this [ByteBuffer]. */
     @JvmStatic
@@ -235,19 +225,16 @@ internal actual constructor(
       return ByteString(copy)
     }
 
-    @JvmStatic
-    actual fun String.encodeUtf8(): ByteString = commonEncodeUtf8()
+    @JvmStatic actual fun String.encodeUtf8(): ByteString = commonEncodeUtf8()
 
-    /** Returns a new [ByteString] containing the `charset`-encoded bytes of this [String].  */
+    /** Returns a new [ByteString] containing the `charset`-encoded bytes of this [String]. */
     @JvmStatic
     @JvmName("encodeString")
     fun String.encode(charset: Charset = Charsets.UTF_8) = ByteString(toByteArray(charset))
 
-    @JvmStatic
-    actual fun String.decodeBase64() = commonDecodeBase64()
+    @JvmStatic actual fun String.decodeBase64() = commonDecodeBase64()
 
-    @JvmStatic
-    actual fun String.decodeHex() = commonDecodeHex()
+    @JvmStatic actual fun String.decodeHex() = commonDecodeHex()
 
     /**
      * Reads `count` bytes from this [InputStream] and returns the result.
@@ -274,7 +261,8 @@ internal actual constructor(
     @JvmName("-deprecated_decodeBase64")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
+        replaceWith =
+            ReplaceWith(
             expression = "string.decodeBase64()",
             imports = ["okio.ByteString.Companion.decodeBase64"]),
         level = DeprecationLevel.ERROR)
@@ -283,34 +271,35 @@ internal actual constructor(
     @JvmName("-deprecated_decodeHex")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
-            expression = "string.decodeHex()",
-            imports = ["okio.ByteString.Companion.decodeHex"]),
+        replaceWith =
+            ReplaceWith(
+            expression = "string.decodeHex()", imports = ["okio.ByteString.Companion.decodeHex"]),
         level = DeprecationLevel.ERROR)
     fun decodeHex(string: String) = string.decodeHex()
 
     @JvmName("-deprecated_encodeString")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
-            expression = "string.encode(charset)",
-            imports = ["okio.ByteString.Companion.encode"]),
+        replaceWith =
+            ReplaceWith(
+            expression = "string.encode(charset)", imports = ["okio.ByteString.Companion.encode"]),
         level = DeprecationLevel.ERROR)
     fun encodeString(string: String, charset: Charset) = string.encode(charset)
 
     @JvmName("-deprecated_encodeUtf8")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
-            expression = "string.encodeUtf8()",
-            imports = ["okio.ByteString.Companion.encodeUtf8"]),
+        replaceWith =
+            ReplaceWith(
+            expression = "string.encodeUtf8()", imports = ["okio.ByteString.Companion.encodeUtf8"]),
         level = DeprecationLevel.ERROR)
     fun encodeUtf8(string: String) = string.encodeUtf8()
 
     @JvmName("-deprecated_of")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
+        replaceWith =
+            ReplaceWith(
             expression = "buffer.toByteString()",
             imports = ["okio.ByteString.Companion.toByteString"]),
         level = DeprecationLevel.ERROR)
@@ -319,7 +308,8 @@ internal actual constructor(
     @JvmName("-deprecated_of")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
+        replaceWith =
+            ReplaceWith(
             expression = "array.toByteString(offset, byteCount)",
             imports = ["okio.ByteString.Companion.toByteString"]),
         level = DeprecationLevel.ERROR)
@@ -328,7 +318,8 @@ internal actual constructor(
     @JvmName("-deprecated_read")
     @Deprecated(
         message = "moved to extension function",
-        replaceWith = ReplaceWith(
+        replaceWith =
+            ReplaceWith(
             expression = "inputstream.readByteString(byteCount)",
             imports = ["okio.ByteString.Companion.readByteString"]),
         level = DeprecationLevel.ERROR)

@@ -31,13 +31,10 @@ fun ByteArray.commonToUtf8String(beginIndex: Int = 0, endIndex: Int = size): Str
   val chars = CharArray(endIndex - beginIndex)
 
   var length = 0
-  processUtf16Chars(beginIndex, endIndex) { c ->
-    chars[length++] = c
-  }
+  processUtf16Chars(beginIndex, endIndex) { c -> chars[length++] = c }
 
   return String(chars, 0, length)
 }
-
 fun String.commonAsUtf8ToByteArray(): ByteArray {
   val bytes = ByteArray(4 * length)
 
@@ -47,9 +44,7 @@ fun String.commonAsUtf8ToByteArray(): ByteArray {
     val b0 = this[index]
     if (b0 >= '\u0080') {
       var size = index
-      processUtf8Bytes(index, length) { c ->
-        bytes[size++] = c
-      }
+      processUtf8Bytes(index, length) { c -> bytes[size++] = c }
       return bytes.copyOf(size)
     }
     bytes[index] = b0.toByte()

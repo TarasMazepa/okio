@@ -17,11 +17,11 @@ package okio
 
 import kotlin.jvm.JvmStatic
 
-/** An indexed set of values that may be read with [BufferedSource.select].  */
-class Options private constructor(
-  internal val byteStrings: Array<out ByteString>,
-  internal val trie: IntArray
-) : AbstractList<ByteString>(), RandomAccess {
+/** An indexed set of values that may be read with [BufferedSource.select]. */
+class Options
+    private constructor(
+        internal val byteStrings: Array<out ByteString>, internal val trie: IntArray) :
+    AbstractList<ByteString>(), RandomAccess {
 
   override val size: Int
     get() = byteStrings.size
@@ -84,35 +84,39 @@ class Options private constructor(
      * Builds a trie encoded as an int array. Nodes in the trie are of two types: SELECT and SCAN.
      *
      * SELECT nodes are encoded as:
-     *  - selectChoiceCount: the number of bytes to choose between (a positive int)
-     *  - prefixIndex: the result index at the current position or -1 if the current position is not
-     *    a result on its own
-     *  - a sorted list of selectChoiceCount bytes to match against the input string
-     *  - a heterogeneous list of selectChoiceCount result indexes (>= 0) or offsets (< 0) of the
-     *    next node to follow. Elements in this list correspond to elements in the preceding list.
-     *    Offsets are negative and must be multiplied by -1 before being used.
+     * - selectChoiceCount: the number of bytes to choose between (a positive int)
+     * - prefixIndex: the result index at the current position or -1 if the current position is not
      *
-     * SCAN nodes are encoded as:
-     *  - scanByteCount: the number of bytes to match in sequence. This count is negative and must
-     *    be multiplied by -1 before being used.
-     *  - prefixIndex: the result index at the current position or -1 if the current position is not
-     *    a result on its own
-     *  - a list of scanByteCount bytes to match
-     *  - nextStep: the result index (>= 0) or offset (< 0) of the next node to follow. Offsets are
-     *    negative and must be multiplied by -1 before being used.
+     * a result on its own
+     * - a sorted list of selectChoiceCount bytes to match against the input string
+     * - a heterogeneous list of selectChoiceCount result indexes (>= 0) or offsets (< 0) of the
      *
-     * This structure is used to improve locality and performance when selecting from a list of
-     * options.
+     * next node to follow. Elements in this list correspond to elements in the preceding list.
+     *     Offsets are negative and must be multiplied by -1 before being used.
+     *
+     *     SCAN nodes are encoded as:
+     * - scanByteCount: the number of bytes to match in sequence. This count is negative and must
+     *
+     * be multiplied by -1 before being used.
+     * - prefixIndex: the result index at the current position or -1 if the current position is not
+     *
+     * a result on its own
+     * - a list of scanByteCount bytes to match
+     * - nextStep: the result index (>= 0) or offset (< 0) of the next node to follow. Offsets are
+     *
+     * negative and must be multiplied by -1 before being used.
+     *
+     *     This structure is used to improve locality and performance when selecting from a list of
+     *     options.
      */
     private fun buildTrieRecursive(
-      nodeOffset: Long = 0L,
-      node: Buffer,
-      byteStringOffset: Int = 0,
-      byteStrings: List<ByteString>,
-      fromIndex: Int = 0,
-      toIndex: Int = byteStrings.size,
-      indexes: List<Int>
-    ) {
+        nodeOffset: Long = 0L,
+        node: Buffer,
+        byteStringOffset: Int = 0,
+        byteStrings: List<ByteString>,
+        fromIndex: Int = 0,
+        toIndex: Int = byteStrings.size,
+        indexes: List<Int>) {
       require(fromIndex < toIndex)
       for (i in fromIndex until toIndex) {
         require(byteStrings[i].size >= byteStringOffset)
@@ -164,8 +168,7 @@ class Options private constructor(
             }
           }
 
-          if (rangeStart + 1 == rangeEnd &&
-              byteStringOffset + 1 == byteStrings[rangeStart].size) {
+          if (rangeStart + 1 == rangeEnd && byteStringOffset + 1 == byteStrings[rangeStart].size) {
             // The result is a single index.
             node.writeInt(indexes[rangeStart])
           } else {
@@ -227,6 +230,7 @@ class Options private constructor(
       }
     }
 
-    private val Buffer.intCount get() = size / 4
+    private val Buffer.intCount
+      get() = size / 4
   }
 }

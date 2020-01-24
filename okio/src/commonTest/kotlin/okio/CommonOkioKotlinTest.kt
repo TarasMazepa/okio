@@ -20,14 +20,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class CommonOkioKotlinTest {
-  @Test fun sourceBuffer() {
+  @Test
+  fun sourceBuffer() {
     val source = Buffer().writeUtf8("a")
     val buffered = (source as Source).buffer()
     assertEquals(buffered.readUtf8(), "a")
     assertEquals(source.size, 0L)
   }
 
-  @Test fun sinkBuffer() {
+  @Test
+  fun sinkBuffer() {
     val sink = Buffer()
     val buffered = (sink as Sink).buffer()
     buffered.writeUtf8("a")
@@ -36,7 +38,8 @@ class CommonOkioKotlinTest {
     assertEquals(sink.size, 1L)
   }
 
-  @Test fun blackhole() {
+  @Test
+  fun blackhole() {
     blackholeSink().write(Buffer().writeUtf8("a"), 1L)
   }
 }

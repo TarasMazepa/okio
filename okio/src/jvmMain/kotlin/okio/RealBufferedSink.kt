@@ -39,9 +39,8 @@ import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-internal actual class RealBufferedSink actual constructor(
-  @JvmField actual val sink: Sink
-) : BufferedSink {
+internal actual class RealBufferedSink actual constructor(@JvmField actual val sink: Sink) :
+    BufferedSink {
   @JvmField val bufferField = Buffer()
   @JvmField actual var closed: Boolean = false
 
@@ -54,10 +53,10 @@ internal actual class RealBufferedSink actual constructor(
   override fun write(source: Buffer, byteCount: Long) = commonWrite(source, byteCount)
   override fun write(byteString: ByteString) = commonWrite(byteString)
   override fun write(byteString: ByteString, offset: Int, byteCount: Int) =
-    commonWrite(byteString, offset, byteCount)
+      commonWrite(byteString, offset, byteCount)
   override fun writeUtf8(string: String) = commonWriteUtf8(string)
   override fun writeUtf8(string: String, beginIndex: Int, endIndex: Int) =
-    commonWriteUtf8(string, beginIndex, endIndex)
+      commonWriteUtf8(string, beginIndex, endIndex)
 
   override fun writeUtf8CodePoint(codePoint: Int) = commonWriteUtf8CodePoint(codePoint)
 
@@ -67,12 +66,8 @@ internal actual class RealBufferedSink actual constructor(
     return emitCompleteSegments()
   }
 
-  override fun writeString(
-    string: String,
-    beginIndex: Int,
-    endIndex: Int,
-    charset: Charset
-  ): BufferedSink {
+  override fun writeString(string: String, beginIndex: Int, endIndex: Int, charset: Charset):
+      BufferedSink {
     check(!closed) { "closed" }
     buffer.writeString(string, beginIndex, endIndex, charset)
     return emitCompleteSegments()
@@ -80,7 +75,7 @@ internal actual class RealBufferedSink actual constructor(
 
   override fun write(source: ByteArray) = commonWrite(source)
   override fun write(source: ByteArray, offset: Int, byteCount: Int) =
-    commonWrite(source, offset, byteCount)
+      commonWrite(source, offset, byteCount)
 
   override fun write(source: ByteBuffer): Int {
     check(!closed) { "closed" }
